@@ -8,28 +8,19 @@ from typing import Callable
 from tkinter import ttk
 
 from phase_control.io.interfaces import FrameBufferProtocol
-from phase_control.core.interfaces import SpectrumPlotProtocol
 
-
-# ---------------------------------------------------------------------------
-# Module context
-# ---------------------------------------------------------------------------
 
 @dataclass
 class ModuleContext:
     """
     Shared services that every module has access to.
 
-    Extend this later if you need more cross-cutting services (logging,
-    global app config, waveplate control, ...).
+    For now this is just the FrameBuffer which provides live spectra.
+    If you later need more cross-cutting services (logging, global config,
+    waveplate access, ...), you can extend this dataclass.
     """
     buffer: FrameBufferProtocol
-    plot: SpectrumPlotProtocol
 
-
-# ---------------------------------------------------------------------------
-# Base class for all modules
-# ---------------------------------------------------------------------------
 
 class BaseModule(ABC):
     """
@@ -37,7 +28,7 @@ class BaseModule(ABC):
 
     Lifecycle (from the MainWindow's perspective):
 
-      1. Create a ModuleContext (buffer, plot, ...).
+      1. Create a ModuleContext (buffer, ...).
       2. Instantiate a module: module = SomeModule(context).
       3. Ask the module to build its UI:
             root_frame = module.create_ui(parent_frame)
@@ -96,10 +87,7 @@ class BaseModule(ABC):
         """
         Start the module's processing.
 
-        Typical responsibilities:
-          - set an internal 'running' flag,
-          - schedule the first iteration via `root_frame.after(...)`,
-          - optionally pull initial state from the ModuleContext.
+        The module is free to use `root_frame.after(...)`, threads, etc.
         """
         ...
 
@@ -108,11 +96,8 @@ class BaseModule(ABC):
         """
         Stop the module and reset its state.
 
-        Typical responsibilities:
-          - clear internal 'running' flags,
-          - cancel any outstanding `.after` callbacks,
-          - clear the shared plot (self.context.plot.clear()),
-          - reset UI elements to their default state.
+        Should stop any .after loops, worker threads, clear plots, and
+        reset config UI where appropriate.
         """
         ...
 
