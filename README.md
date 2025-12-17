@@ -27,7 +27,6 @@ This script will:
 If you need to activate the environment manually:
 
 ```powershell
-.\.venv32\Scripts\Activate.ps1
 .\.venv64\Scripts\Activate.ps1
 ```
 
