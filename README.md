@@ -1,6 +1,6 @@
 # Project Setup & Useful Commands
 
-This repository contains.  
+This repository contains the code for running the Phase Control application.  
 Below is a quick reference for setting up the environments and running the programs.
 
 ---
@@ -13,24 +13,7 @@ Use the provided PowerShell script:
 
 ```powershell
 . .\setup_env.ps1
-````
-
-This script will:
-
-* Creates both virtual environments (`.venv32` and `.venv64`) if they do not exist
-* Activate the virtual environment
-* Install / update the required packages
-* Install / update the recommended extensions
-
-### 1.2 Manually activate existing venv (if needed)
-
-If you need to activate the environment manually:
-
-```powershell
-.\.venv64\Scripts\Activate.ps1
 ```
-
----
 
 ## 3. Running the Applications
 
