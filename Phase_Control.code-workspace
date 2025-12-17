@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../Base_Lib"
+		},
+		{
+			"path": "../Devices"
+		}
+	],
+	"settings": {}
+}
