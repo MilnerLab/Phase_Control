@@ -6,9 +6,9 @@ from typing import Sequence
 
 import numpy as np
 
+from base_lib.math.models import Range
 from base_lib.quantities.enums import Prefix
 from base_lib.quantities.models import Length
-from elliptec.elliptec_ell14 import Range
 
 
 

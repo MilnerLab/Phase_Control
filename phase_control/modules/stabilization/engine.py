@@ -7,8 +7,9 @@ from typing import Optional, cast
 import numpy as np
 
 from base_lib.math.functions import usCFG_projection
-from elliptec.elliptec_ell14 import Angle, ElliptecRotator
 
+from base_lib.math.models import Angle
+from elliptec.elliptec_ell14_copy import Rotator
 from phase_control.core.models import Spectrum
 from phase_control.io.interfaces import FrameBufferProtocol
 from phase_control.modules.stabilization.config import AnalysisConfig, FitParameter
@@ -50,7 +51,8 @@ class AnalysisEngine:
         self._buffer = buffer
         self._phase_tracker = PhaseTracker(cast(AnalysisConfig, self.config))
         self._phase_corrector = PhaseCorrector()
-        self._rotator = ElliptecRotator(max_address="0")
+        self._rotator = Rotator(port="COM6")
+        #self._rotator = ElliptecRotator(max_address="0")
 
     def reset(self) -> None:
         """
