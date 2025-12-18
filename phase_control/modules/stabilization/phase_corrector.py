@@ -6,7 +6,10 @@ import math
 
 import numpy as np
 
-from base_lib.models import Angle, AngleUnit
+from base_lib.math.enums import AngleUnit
+from base_lib.math.models import Angle
+
+
 
 # Starting phase (target) and tolerance
 STARTING_PHASE = Angle(0, AngleUnit.DEG)

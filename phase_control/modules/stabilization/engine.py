@@ -6,9 +6,8 @@ from typing import Optional, cast
 
 import numpy as np
 
-from base_lib.functions import usCFG_projection
-from base_lib.models import Angle
-from elliptec.elliptec_ell14 import ElliptecRotator
+from base_lib.math.functions import usCFG_projection
+from elliptec.elliptec_ell14 import Angle, ElliptecRotator
 
 from phase_control.core.models import Spectrum
 from phase_control.io.interfaces import FrameBufferProtocol
