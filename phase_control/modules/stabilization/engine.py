@@ -6,8 +6,8 @@ from typing import Optional, cast
 import numpy as np
 
 
-from base_lib.math.functions import usCFG_projection
-from base_lib.math.models import Angle
+from base_core.math.functions import usCFG_projection
+from base_core.math.models import Angle
 from phase_control.core.models import Spectrum
 from phase_control.core.rotator.rotator_worker import RotatorWorker
 from phase_control.io.interfaces import FrameBufferProtocol

@@ -4,7 +4,7 @@ import threading
 import time
 from typing import Optional
 
-from base_lib.math.models import Angle
+from base_core.math.models import Angle
 from elliptec.elliptec_ell14 import Rotator, StatusCode
 
 

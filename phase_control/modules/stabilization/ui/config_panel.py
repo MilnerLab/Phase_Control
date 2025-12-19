@@ -5,9 +5,9 @@ from dataclasses import fields
 import tkinter as tk
 from tkinter import ttk
 
-from base_lib.math.models import Angle, Range
-from base_lib.quantities.enums import Prefix
-from base_lib.quantities.models import Length
+from base_core.math.models import Angle, Range
+from base_core.quantities.enums import Prefix
+from base_core.quantities.models import Length
 from phase_control.modules.stabilization.config import AnalysisConfig
 
 

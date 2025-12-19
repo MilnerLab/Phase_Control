@@ -8,9 +8,9 @@ from typing import Any, Callable, ClassVar, Sequence, TypeVar, get_type_hints
 import lmfit
 import numpy as np
 
-from base_lib.math.models import Angle, Range
-from base_lib.quantities.enums import Prefix
-from base_lib.quantities.models import Length
+from base_core.math.models import Angle, Range
+from base_core.quantities.enums import Prefix
+from base_core.quantities.models import Length
 
 T = TypeVar("T", bound="FitParameter")
 

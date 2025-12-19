@@ -6,8 +6,8 @@ import math
 
 import numpy as np
 
-from base_lib.math.enums import AngleUnit
-from base_lib.math.models import Angle
+from base_core.math.enums import AngleUnit
+from base_core.math.models import Angle
 
 
 

@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "../Devices"
+		},
+		{
+			"path": "../Base_Qt"
 		}
 	],
 	"settings": {}

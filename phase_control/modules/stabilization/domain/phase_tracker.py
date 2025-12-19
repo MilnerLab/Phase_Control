@@ -8,8 +8,8 @@ from typing import Any, Deque
 import lmfit
 
 
-from base_lib.math.functions import usCFG_projection
-from base_lib.math.models import Angle
+from base_core.math.functions import usCFG_projection
+from base_core.math.models import Angle
 from phase_control.core.models import Spectrum
 from phase_control.modules.stabilization.config import AnalysisConfig, FitParameter
 
