@@ -9,7 +9,7 @@ import numpy as np
 from base_lib.math.functions import usCFG_projection
 
 from base_lib.math.models import Angle
-from elliptec.elliptec_ell14_copy import Rotator
+from elliptec.elliptec_ell14 import Rotator
 from phase_control.core.models import Spectrum
 from phase_control.io.interfaces import FrameBufferProtocol
 from phase_control.modules.stabilization.config import AnalysisConfig, FitParameter
