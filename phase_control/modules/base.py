@@ -94,7 +94,14 @@ class BaseModule(ABC):
     @abstractmethod
     def reset(self) -> None:
         """
-        Stop the module and reset its state.
+        Reset its state.
+        """
+        ...
+        
+    @abstractmethod
+    def close(self) -> None:
+        """
+        Stop the module.
 
         Should stop any .after loops, worker threads, clear plots, and
         reset config UI where appropriate.

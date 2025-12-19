@@ -87,7 +87,7 @@ class MainWindow:
         # Reset and remove existing module
         if self._current_module is not None:
             try:
-                self._current_module.reset()
+                self._current_module.close()
             except Exception:
                 pass
 

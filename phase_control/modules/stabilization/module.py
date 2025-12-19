@@ -106,6 +106,10 @@ class StabilizationModule(BaseModule):
         self._plot_panel.clear()
         self._config_panel.refresh_from_config()
         self._config_panel.set_running(False)
+        
+    def close(self):
+        self.reset()
+        self._engine.close()
 
     # ------------------------------------------------------------------ #
     # Internals: Tk .after loop
