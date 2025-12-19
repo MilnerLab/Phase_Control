@@ -51,7 +51,7 @@ class AnalysisEngine:
         self._buffer = buffer
         self._phase_tracker = PhaseTracker(cast(AnalysisConfig, self.config))
         self._phase_corrector = PhaseCorrector()
-        self._rotator = Rotator(port="COM6")
+        self._rotator = Rotator(port="COM6", address=str(0))
         #self._rotator = ElliptecRotator(max_address="0")
 
     def reset(self) -> None:
