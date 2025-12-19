@@ -1,5 +1,5 @@
 asteval==1.0.7
--e ../Base_Lib
+-e ../Base_Core
 -e ../Devices
 cffi==2.0.0
 clr_loader==0.2.9
