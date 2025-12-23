@@ -1,17 +1,45 @@
 {
-	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "../Base_Core"
-		},
-		{
-			"path": "../Devices"
-		},
-		{
-			"path": "../Base_Qt"
-		}
-	],
-	"settings": {}
+  "folders": [
+    { "path": ".", "name": "Phase_Control" },
+    { "path": "../Base_Core" },
+    { "path": "../Base_Qt" },
+    { "path": "../Devices" },
+  ],
+  "launch": {
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug script",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "phase_control.Demo.script",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Debug app",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "app",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+  ]
+},
+  "settings": {
+    "python.defaultInterpreterPath": "${workspaceFolder:Phase_Control}/.venv/bin/python",
+    "python.analysis.indexing": true,
+    "python.analysis.autoImportCompletions": true,
+  "python.analysis.extraPaths": [ "${workspaceFolder:Base_Core}", "${workspaceFolder:Base_Qt}", "${workspaceFolder:Devices}" ],
+  "python.analysis.packageIndexDepths": [
+  { "name": "PySide6", "depth": 6, "includeAllSymbols": true },
+  { "name": "shiboken6", "depth": 3, "includeAllSymbols": true },
+
+  { "name": "base_core", "depth": 5, "includeAllSymbols": true },
+  { "name": "base_qt",   "depth": 5, "includeAllSymbols": true },
+  { "name": "spm_002",   "depth": 5, "includeAllSymbols": true },
+  { "name": "elliptec",  "depth": 5, "includeAllSymbols": true }
+]
+}
+
 }

@@ -1,57 +1,97 @@
-# app.py (at repo root, e.g. next to phase_control/)
+# your_app/app.py
 from __future__ import annotations
 
-import threading
+import logging
+import sys
+from concurrent.futures import ThreadPoolExecutor
 
-from phase_control.io import SpectrometerStreamClient, FrameBuffer
-from phase_control.modules import ModuleContext
-from phase_control.ui.main_window import run_main_window
-
-
-def _acquisition_loop(
-    client: SpectrometerStreamClient,
-    buffer: FrameBuffer,
-    stop_event: threading.Event,
-) -> None:
-    """
-    Background loop that pulls frames from the 32-bit process
-    and feeds them into the FrameBuffer.
-    """
-    try:
-        for frame in client.frames():
-            if stop_event.is_set():
-                break
-            buffer.update(frame)
-    finally:
-        # When we exit the loop, the context manager in main() will
-        # take care of stopping the client process.
-        pass
+from PySide6.QtWidgets import QApplication
 
 
-def main() -> None:
-    stop_event = threading.Event()
 
-    # Start 32-bit acquisition process and stream client
-    with SpectrometerStreamClient() as client:
-        meta = client.start()
-        buffer = FrameBuffer(meta)
+# ---- base_qt (Qt adapters) ----
+from base_core.framework.app import AppContext, Lifecycle
+from base_core.framework.concurrency import ITaskRunner, TaskRunner
+from base_core.framework.di import Container
+from base_core.framework.events import EventBus
+from base_core.framework.log import setup_logging
+from base_core.framework.modules import ModuleManager
+from base_qt.app.dispatcher import QtDispatcher
+from phase_control.app.main_window_view import MainWindowView
+from phase_control.app.module import AppModule
 
-        # Background thread to fill the buffer
-        worker = threading.Thread(
-            target=_acquisition_loop,
-            args=(client, buffer, stop_event),
-            daemon=True,
-        )
-        worker.start()
+# from your_app.modules.spectrometer.module import SpectrometerModule
+# from your_app.modules.analysis.module import AnalysisModule
 
-        # Create module context and run the global main window
-        context = ModuleContext(buffer=buffer)
-        run_main_window(context, stop_event)
 
-        # UI has exited -> signal worker to stop and wait
-        stop_event.set()
-        worker.join(timeout=2.0)
+def build_context() -> AppContext:
+    log = setup_logging("your_app", level=logging.INFO)
+
+    lifecycle = Lifecycle()
+    events = EventBus()
+    executor = ThreadPoolExecutor(max_workers=4)
+    ui = QtDispatcher()
+    ctx = AppContext(
+        config={
+            "app_name": "Your App",
+        },
+        log=log,
+        events=events,
+        executor=executor,
+        lifecycle=lifecycle,
+        ui=ui,
+    )
+
+    # Ensure executor is closed on shutdown
+    ctx.lifecycle.add_shutdown_hook(lambda: executor.shutdown(wait=False))
+    return ctx
+
+
+def build_container(ctx: AppContext) -> Container:
+    c = Container()
+
+    # Core singletons / instances
+    c.register_instance(AppContext, ctx)
+
+    # One standard async entrypoint
+    c.register_singleton(
+        ITaskRunner,
+        lambda c: TaskRunner(ctx.executor, ui_post=(ctx.ui.post if ctx.ui else None)),
+    )
+
+    return c
+
+
+def get_modules():
+    # Add feature modules here (hybrid approach: shell + feature modules)
+    return [
+        AppModule(),
+        # SpectrometerModule(),
+        # AnalysisModule(),
+    ]
+
+
+def main(argv: list[str] | None = None) -> int:
+    argv = argv if argv is not None else sys.argv
+
+    app = QApplication(argv)
+
+    ctx = build_context()
+    c = build_container(ctx)
+
+    # Bootstrap modules (register + start; stop happens via lifecycle shutdown)
+    ModuleManager(get_modules()).bootstrap(c, ctx)
+
+    # Resolve and show main window (ShellModule should register AppMainWindowView as factory)
+    win = c.get(MainWindowView)
+    win.show()
+
+    rc = app.exec()
+
+    # Stop modules + cleanup
+    ctx.lifecycle.shutdown(log=ctx.log)
+    return rc
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
