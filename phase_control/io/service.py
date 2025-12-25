@@ -4,7 +4,7 @@ import threading
 from dataclasses import dataclass
 from typing import Optional
 
-from base_core.framework.concurrency import StreamHandle
+from base_core.framework.concurrency.models import StreamHandle
 from base_core.framework.events import EventBus
 from phase_control.core.services.service_base import ServiceBase
 from phase_control.io.frame_buffer import FrameBuffer

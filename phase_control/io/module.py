@@ -7,7 +7,7 @@ from phase_control.io.stream_client import SpectrometerStreamClient
 
 
 class IOModule(BaseModule):
-    requires = (AppModule)
+    requires = (AppModule,)
 
     def register(self, c, ctx) -> None:
         c.register_singleton(FrameBuffer, lambda c: FrameBuffer())
@@ -16,7 +16,7 @@ class IOModule(BaseModule):
             SpectrometerAcquisitionService,
             lambda c: SpectrometerAcquisitionService(
                 io=c.get(IIoTaskRunner),
-                bus=ctx.bus,                 
+                bus=ctx.event_bus,                 
                 buffer=c.get(FrameBuffer),
                 client=c.get(SpectrometerStreamClient),
             ),

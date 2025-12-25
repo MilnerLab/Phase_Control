@@ -11,7 +11,7 @@ from PySide6.QtWidgets import QApplication
 
 # ---- base_qt (Qt adapters) ----
 from base_core.framework.app import AppContext, Lifecycle
-from base_core.framework.concurrency import ITaskRunner, TaskRunner
+from base_core.framework.concurrency.task_runner import TaskRunner
 from base_core.framework.di import Container
 from base_core.framework.events import EventBus
 from base_core.framework.log import setup_logging
@@ -26,13 +26,13 @@ def build_context() -> AppContext:
     log = setup_logging("your_app", level=logging.INFO)
 
     lifecycle = Lifecycle()
-    events = EventBus()
+    bus = EventBus()
     ctx = AppContext(
         config={
             "app_name": "Your App",
         },
         log=log,
-        events=events,
+        event_bus=bus,
         lifecycle=lifecycle,
     )
 
