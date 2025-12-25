@@ -1,0 +1,6 @@
+from typing import Protocol
+
+from base_core.framework.concurrency import ITaskRunner
+
+class IIoTaskRunner(ITaskRunner, Protocol): ...
+class ICpuTaskRunner(ITaskRunner, Protocol): ...

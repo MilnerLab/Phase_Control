@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import Any, Protocol
 
 
-class FrameBufferProtocol(Protocol):
+class IFrameBuffer(Protocol):
     """
     Minimal interface for an object that provides live spectrometer frames.
 

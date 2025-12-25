@@ -10,7 +10,7 @@ from base_core.math.functions import usCFG_projection
 from base_core.math.models import Angle
 from phase_control.core.models import Spectrum
 from phase_control.core.rotator.rotator_worker import RotatorWorker
-from phase_control.io.interfaces import FrameBufferProtocol
+from phase_control.io.interfaces import IFrameBuffer
 from phase_control.modules.stabilization.config import AnalysisConfig
 from phase_control.modules.stabilization.domain.phase_corrector import PhaseCorrector
 from phase_control.modules.stabilization.domain.phase_tracker import PhaseTracker
@@ -34,7 +34,7 @@ class AnalysisEngine:
     def __init__(
         self,
         config: AnalysisConfig,
-        buffer: FrameBufferProtocol,
+        buffer: IFrameBuffer,
         *,
         rotator_port: str = "COM6",
         rotator_address: str = "0",

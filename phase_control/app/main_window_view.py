@@ -28,7 +28,7 @@ class MainWindowView(MainWindowViewBase[MainWindowViewModel]):
     """
 
     def __init__(self, vm: MainWindowViewModel, registry: IViewRegistry):
-        super().__init__(vm, registry, title="My App")
+        super().__init__(vm, registry, title="Phase Control")
 
     # ---------------- UI ----------------
 

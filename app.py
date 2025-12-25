@@ -16,12 +16,10 @@ from base_core.framework.di import Container
 from base_core.framework.events import EventBus
 from base_core.framework.log import setup_logging
 from base_core.framework.modules import ModuleManager
-from base_qt.app.dispatcher import QtDispatcher
 from phase_control.app.main_window_view import MainWindowView
 from phase_control.app.module import AppModule
-
-# from your_app.modules.spectrometer.module import SpectrometerModule
-# from your_app.modules.analysis.module import AnalysisModule
+from phase_control.core.concurrency.runners import ICpuTaskRunner, IIoTaskRunner
+from phase_control.io.module import IOModule
 
 
 def build_context() -> AppContext:
@@ -29,35 +27,31 @@ def build_context() -> AppContext:
 
     lifecycle = Lifecycle()
     events = EventBus()
-    executor = ThreadPoolExecutor(max_workers=4)
-    ui = QtDispatcher()
     ctx = AppContext(
         config={
             "app_name": "Your App",
         },
         log=log,
         events=events,
-        executor=executor,
         lifecycle=lifecycle,
-        ui=ui,
     )
 
-    # Ensure executor is closed on shutdown
-    ctx.lifecycle.add_shutdown_hook(lambda: executor.shutdown(wait=False))
     return ctx
 
 
 def build_container(ctx: AppContext) -> Container:
     c = Container()
 
-    # Core singletons / instances
     c.register_instance(AppContext, ctx)
 
-    # One standard async entrypoint
-    c.register_singleton(
-        ITaskRunner,
-        lambda c: TaskRunner(ctx.executor, ui_post=(ctx.ui.post if ctx.ui else None)),
-    )
+    io_exec = ThreadPoolExecutor(max_workers=1, thread_name_prefix="io")
+    cpu_exec = ThreadPoolExecutor(max_workers=1, thread_name_prefix="cpu") 
+
+    c.register_singleton(IIoTaskRunner, lambda c: TaskRunner(io_exec))
+    c.register_singleton(ICpuTaskRunner, lambda c: TaskRunner(cpu_exec))
+
+    ctx.lifecycle.add_shutdown_hook(lambda: io_exec.shutdown(wait=False))
+    ctx.lifecycle.add_shutdown_hook(lambda: cpu_exec.shutdown(wait=False))
 
     return c
 
@@ -66,7 +60,7 @@ def get_modules():
     # Add feature modules here (hybrid approach: shell + feature modules)
     return [
         AppModule(),
-        # SpectrometerModule(),
+        IOModule(),
         # AnalysisModule(),
     ]
 

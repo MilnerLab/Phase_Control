@@ -17,13 +17,14 @@
       "justMyCode": true
     },
     {
-      "name": "Debug app",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "app",
-      "console": "integratedTerminal",
-      "justMyCode": true
-    },
+  "name": "Debug app.py",
+  "type": "debugpy",
+  "request": "launch",
+  "program": "${workspaceFolder:Phase_Control}/app.py",
+  "cwd": "${workspaceFolder:Phase_Control}",
+  "console": "integratedTerminal",
+  "justMyCode": true
+  },
   ]
 },
   "settings": {
