@@ -15,20 +15,14 @@ from PySide6.QtWidgets import (
 )
 
 from base_qt.views.bases.main_window_view_base import MainWindowViewBase
+from base_qt.views.bases.view_base import ViewBase
 from base_qt.views.registry.interfaces import IViewRegistry
 from phase_control.app.main_window_vm import MainWindowViewModel
 
 
 class MainWindowView(MainWindowViewBase[MainWindowViewModel]):
-    """
-    Shell main window:
-    - Top row: Module label + combobox + Run/Reset (wie vorher)
-    - Central: exactly one ViewKind.PAGE at a time, chosen via combobox
-    """
-
     def __init__(self, vm: MainWindowViewModel, registry: IViewRegistry):
-        self._pages: Dict[str, QWidget] = {}
-        self._current_page_id: Optional[str] = None
+        self._current_page: Optional[ViewBase] = None
         super().__init__(vm, registry, title="Phase Control")
 
     def build_ui(self) -> None:
@@ -74,21 +68,16 @@ class MainWindowView(MainWindowViewBase[MainWindowViewModel]):
 
     def bind(self) -> None:
         super().bind()
-
-        self.vm.pages_changed.connect(self._rebuild_pages)
+        
+        self._fill_combo_box()
         self.vm.selected_page_changed.connect(self._show_page)
 
         self._module_box.currentIndexChanged.connect(self._on_combo_changed)
         self._btn_run.clicked.connect(self.vm.run_selected_module)
         self._btn_reset.clicked.connect(self.vm.reset_selected_module)
 
-        self._rebuild_pages()
-        if self.vm.selected_page_id:
-            self._show_page(self.vm.selected_page_id)
-
     def unbind(self) -> None:
         try:
-            self.vm.pages_changed.disconnect(self._rebuild_pages)
             self.vm.selected_page_changed.disconnect(self._show_page)
         except (TypeError, RuntimeError):
             pass
@@ -108,52 +97,36 @@ class MainWindowView(MainWindowViewBase[MainWindowViewModel]):
 
     # ---------------- internals ----------------
 
-    @Slot()
-    def _rebuild_pages(self) -> None:
-        self._module_box.blockSignals(True)
-        try:
-            self._module_box.clear()
-            for p in self.vm.pages:
-                self._module_box.addItem(p.title, p.id)  # userData = page_id
-
-            sel = self.vm.selected_page_id
-            if sel is not None:
-                idx = self._module_box.findData(sel)
-                if idx >= 0:
-                    self._module_box.setCurrentIndex(idx)
-        finally:
-            self._module_box.blockSignals(False)
-
     @Slot(int)
     def _on_combo_changed(self, _idx: int) -> None:
         page_id = self._module_box.currentData()
         if page_id is not None:
             self.vm.select_page(str(page_id))
 
-    @Slot(str)
-    def _show_page(self, page_id: str) -> None:
-        # optional: unbind old page (stop subscriptions while hidden)
-        if self._current_page_id is not None:
-            old = self._pages.get(self._current_page_id)
-            if old is not None and hasattr(old, "unbind"):
-                try:
-                    old.unbind()  # type: ignore[attr-defined]
-                except Exception:
-                    pass
-
-        page = self._pages.get(page_id)
-        if page is None:
-            factory = self.vm.page_factory(page_id)
-            page = factory()  # new page instance (first time)
-            self._pages[page_id] = page
-            self._stack.addWidget(page)
-
-        self._stack.setCurrentWidget(page)
-        self._current_page_id = page_id
-
-        # optional: bind new page
-        if hasattr(page, "bind"):
+    @Slot(ViewBase)
+    def _show_page(self, page: ViewBase) -> None:
+        if self._current_page is not None:
             try:
-                page.bind()  # type: ignore[attr-defined]
+                self._current_page.unbind()  
             except Exception:
                 pass
+        
+        self._stack.addWidget(page)
+        self._stack.setCurrentWidget(page)
+        self._current_page = page
+
+        try:
+            page.bind()  
+        except Exception:
+            pass
+        
+    def _fill_combo_box(self):
+        self._module_box.blockSignals(True)
+        try:
+            self._module_box.clear()
+            self._module_box.addItem("", "test") 
+            for spec in self.vm.pages:
+                self._module_box.addItem(spec.title, spec.id) 
+
+        finally:
+            self._module_box.blockSignals(False)
