@@ -8,7 +8,7 @@ import tkinter as tk
 from tkinter import ttk
 
 from phase_control.modules.base import BaseModule, ModuleContext
-from phase_control.core.plotting.spectrum_plot import SpectrumPlotPanel
+from phase_control.core.plotting.spectrum_plot_view import SpectrumPlotPanel
 
 
 class RandomizeModule(BaseModule):

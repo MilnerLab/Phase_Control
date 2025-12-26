@@ -16,9 +16,11 @@ from base_core.framework.di import Container
 from base_core.framework.events import EventBus
 from base_core.framework.log import setup_logging
 from base_core.framework.modules import ModuleManager
+from phase_control.analysis_modules.stabilization.module import StabilizationModule
 from phase_control.app.main_window_view import MainWindowView
 from phase_control.app.module import AppModule
 from phase_control.core.concurrency.runners import ICpuTaskRunner, IIoTaskRunner
+from phase_control.core.module import CoreModule
 from phase_control.io.module import IOModule
 
 
@@ -60,7 +62,9 @@ def get_modules():
     # Add feature modules here (hybrid approach: shell + feature modules)
     return [
         AppModule(),
+        CoreModule(),
         IOModule(),
+        StabilizationModule()
         # AnalysisModule(),
     ]
 

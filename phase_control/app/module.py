@@ -10,8 +10,8 @@ from base_qt.views.registry.models import ViewSpec
 from base_qt.views.registry.view_registry import ViewRegistry
 from phase_control.app.main_window_view import MainWindowView
 from phase_control.app.main_window_vm import MainWindowViewModel
-from phase_control.app.menu_bar_view import MenuBarViewModel
-from phase_control.app.menu_bar_vm import MenuBarView
+from phase_control.app.menu_bar_VM import MenuBarViewModel
+from phase_control.app.menu_bar_view import MenuBarView
 
 
 class AppModule(BaseModule):
@@ -30,7 +30,7 @@ class AppModule(BaseModule):
         c.register_singleton(IViewRegistry, lambda c: ViewRegistry())
 
         # --- Shell VM + MenuBar -------------------------------------------
-        c.register_factory(MainWindowViewModel, lambda c: MainWindowViewModel())
+        c.register_factory(MainWindowViewModel, lambda c: MainWindowViewModel(c.get(IViewRegistry), ctx.event_bus))
         c.register_factory(MenuBarViewModel, lambda c: MenuBarViewModel())
         
         # If you want exactly one menubar instance, you can register it as singleton.
