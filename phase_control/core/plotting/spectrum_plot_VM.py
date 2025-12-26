@@ -1,7 +1,7 @@
 # your_app/ui/plot/plot_vm.py
 from __future__ import annotations
 
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 import numpy as np
 from PySide6.QtCore import QObject, Signal
@@ -14,8 +14,8 @@ class PlotVM(QObject):
     - series count is dynamic.
     """
 
-    x_changed = Signal(object)              # np.ndarray
-    series_updated = Signal(str, object)    # key, np.ndarray(y)
+    x_changed = Signal(List[float])              # np.ndarray
+    series_updated = Signal(str, List[float])    # key, np.ndarray(y)
     series_removed = Signal(str)            # key
     cleared = Signal()
 

@@ -10,10 +10,7 @@ from base_qt.views.bases.view_base import ViewBase
 from base_qt.views.registry.enums import ViewKind
 from base_qt.views.registry.interfaces import IViewRegistry
 from base_qt.views.registry.models import ViewSpec
-
-
-TOPIC_SHELL_RUN = "shell.run"
-TOPIC_SHELL_RESET = "shell.reset"
+from phase_control.app.events import TOPIC_SHELL_RESET, TOPIC_SHELL_RUN
 
 
 
