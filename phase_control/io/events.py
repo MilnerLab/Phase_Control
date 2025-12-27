@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 
 
-TOPIC_SPECTRUM_ARRIVED = "io.spectrum_arrived"
+TOPIC_NEW_SPECTRUM = "io.new_spectrum"
 TOPIC_ACQ_ERROR = "io.acquisition_error"
 
 
 @dataclass(frozen=True)
-class SpectrumArrived:
+class NewSpectrumEventArgs:
     timestamp: float
     device_index: int

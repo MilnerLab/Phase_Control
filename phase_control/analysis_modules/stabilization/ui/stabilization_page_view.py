@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QPushButton, QHBoxLayout, QVBoxLayout, QWidget
 
 from base_qt.views.bases.view_base import ViewBase
 from phase_control.analysis_modules.stabilization.ui.stabiliation_page_VM import StabilizationPageVM
-from phase_control.core.plotting.spectrum_plot_view import PlotView
+from phase_control.core.plotting.spectrum_plot_view import SpectrumPlotView
 
 
 
@@ -25,7 +25,7 @@ class StabilizationPageView(ViewBase[StabilizationPageVM]):
         root.addLayout(bar)
 
         # plot area (new instance per page view)
-        self._plot_view = PlotView(self.vm.plot)
+        self._plot_view = SpectrumPlotView(self.vm.plot)
         root.addWidget(self._plot_view, 1)
 
     def bind(self) -> None:
@@ -33,17 +33,6 @@ class StabilizationPageView(ViewBase[StabilizationPageVM]):
             return
         super().bind()
 
-        self.vm.bind()
-        self._btn_snapshot.clicked.connect(self.vm.snapshot)
-        self._btn_clear.clicked.connect(self.vm.clear_snapshots)
+        self.connect_binding(self._btn_snapshot.clicked, self.vm.snapshot)
+        self.connect_binding(self._btn_clear.clicked, self.vm.clear_snapshots)
 
-    def unbind(self) -> None:
-        try:
-            self._btn_snapshot.clicked.disconnect(self.vm.snapshot)
-            self._btn_clear.clicked.disconnect(self.vm.clear_snapshots)
-            self._plot_view.unbind()
-        except (TypeError, RuntimeError):
-            pass
-
-        self.vm.unbind()
-        super().unbind()

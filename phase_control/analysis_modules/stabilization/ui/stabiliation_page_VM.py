@@ -6,14 +6,15 @@ from typing import Callable, Optional
 from PySide6.QtCore import QObject, Signal, Slot
 
 from base_core.framework.events.event_bus import EventBus
-from phase_control.core.plotting.spectrum_plot_VM import PlotVM
+from base_qt.view_models.vm_base import VMBase
+from phase_control.core.plotting.spectrum_plot_VM import SpectrumPlotVM
 from phase_control.io.frame_buffer import FrameBuffer
 
 
 TOPIC_SPECTRUM_ARRIVED = "io.spectrum_arrived"
 
 
-class StabilizationPageVM(QObject):
+class StabilizationPageVM(VMBase):
     """
     Qt VM (ok): subscribes to EventBus and emits PlotVM updates.
     Services stay Qt-free; VM does dispatch via Signals/PlotVM.
@@ -21,39 +22,13 @@ class StabilizationPageVM(QObject):
 
     status_changed = Signal(str)
 
-    def __init__(self, bus: EventBus, buffer: FrameBuffer, plot: PlotVM) -> None:
+    def __init__(self, bus: EventBus, plot: SpectrumPlotVM) -> None:
         super().__init__()
         self.plot = plot
         self._bus = bus
-        self._buffer = buffer
-
-        self._unsub: Optional[Callable[[], None]] = None
+        
         self._snap_idx = 0
-
-    def bind(self) -> None:
-        if self._unsub is not None:
-            return
-
-        def on_arrived(_payload) -> None:
-            # runs in publisher thread (IO thread). Keep it light.
-            spec = self._buffer.get_latest()  # must return something like (x, y) or Spectrum
-            if spec is None:
-                return
-
-            # adapt these two lines to your Spectrum shape:
-            x = spec.x
-            y = spec.y
-
-            if self.plot.x is None:
-                self.plot.set_x(x)
-            self.plot.update_series("live", y)
-
-        self._unsub = self._bus.subscribe(TOPIC_SPECTRUM_ARRIVED, on_arrived)
-
-    def unbind(self) -> None:
-        if self._unsub is not None:
-            self._unsub()
-            self._unsub = None
+    
 
     @Slot()
     def snapshot(self) -> None:

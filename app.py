@@ -10,24 +10,29 @@ from PySide6.QtWidgets import QApplication
 
 
 # ---- base_qt (Qt adapters) ----
-from base_core.framework.app import AppContext, Lifecycle
+from base_core.framework.app import AppContext
 from base_core.framework.concurrency.task_runner import TaskRunner
 from base_core.framework.di import Container
 from base_core.framework.events import EventBus
+from base_core.framework.lifecycle.cleanup_collection import CleanupCollection
 from base_core.framework.log import setup_logging
 from base_core.framework.modules import ModuleManager
+from base_qt.app.dispatcher import QtDispatcher
 from phase_control.analysis_modules.stabilization.module import StabilizationModule
-from phase_control.app.main_window_view import MainWindowView
 from phase_control.app.module import AppModule
+from phase_control.app.ui.main_window_view import MainWindowView
 from phase_control.core.concurrency.runners import ICpuTaskRunner, IIoTaskRunner
 from phase_control.core.module import CoreModule
 from phase_control.io.module import IOModule
+from base_qt.app.interfaces import IUiDispatcher
+
+
 
 
 def build_context() -> AppContext:
     log = setup_logging("your_app", level=logging.INFO)
 
-    lifecycle = Lifecycle()
+    lifecycle = CleanupCollection()
     bus = EventBus()
     ctx = AppContext(
         config={
@@ -51,9 +56,11 @@ def build_container(ctx: AppContext) -> Container:
 
     c.register_singleton(IIoTaskRunner, lambda c: TaskRunner(io_exec))
     c.register_singleton(ICpuTaskRunner, lambda c: TaskRunner(cpu_exec))
+    
+    c.register_singleton(IUiDispatcher, lambda c: QtDispatcher())
 
-    ctx.lifecycle.add_shutdown_hook(lambda: io_exec.shutdown(wait=False))
-    ctx.lifecycle.add_shutdown_hook(lambda: cpu_exec.shutdown(wait=False))
+    ctx.lifecycle.add(lambda: io_exec.shutdown(wait=False))
+    ctx.lifecycle.add(lambda: cpu_exec.shutdown(wait=False))
 
     return c
 
@@ -87,7 +94,7 @@ def main(argv: list[str] | None = None) -> int:
     rc = app.exec()
 
     # Stop modules + cleanup
-    ctx.lifecycle.shutdown(log=ctx.log)
+    ctx.lifecycle.clear()
     return rc
 
 

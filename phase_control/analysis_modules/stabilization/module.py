@@ -9,8 +9,7 @@ from phase_control.analysis_modules.stabilization.ui.stabiliation_page_VM import
 from phase_control.analysis_modules.stabilization.ui.stabilization_page_view import StabilizationPageView
 from phase_control.app.module import AppModule
 from phase_control.core.module import CoreModule
-from phase_control.core.plotting.spectrum_plot_VM import PlotVM
-from phase_control.io.frame_buffer import FrameBuffer
+from phase_control.core.plotting.spectrum_plot_VM import SpectrumPlotVM
 
 
 class StabilizationModule(BaseModule):
@@ -18,7 +17,7 @@ class StabilizationModule(BaseModule):
     requires = (AppModule, CoreModule,)  
 
     def register(self, c, ctx) -> None:
-        c.register_factory(StabilizationPageVM, lambda c: StabilizationPageVM(ctx.event_bus, c.get(FrameBuffer), c.get(PlotVM)))
+        c.register_factory(StabilizationPageVM, lambda c: StabilizationPageVM(ctx.event_bus, c.get(SpectrumPlotVM)))
         c.register_factory(StabilizationPageView, lambda c: StabilizationPageView(c.get(StabilizationPageVM)))
 
         view_reg = c.get(IViewRegistry)

@@ -1,26 +1,16 @@
 from __future__ import annotations
 
 import threading
-from dataclasses import dataclass
 from typing import Optional
 
 from base_core.framework.concurrency.models import StreamHandle
 from base_core.framework.events import EventBus
 from phase_control.core.services.service_base import ServiceBase
+from phase_control.io.events import TOPIC_ACQ_ERROR, TOPIC_NEW_SPECTRUM, NewSpectrumEventArgs
 from phase_control.io.frame_buffer import FrameBuffer
 from phase_control.io.stream_client import SpectrometerStreamClient
 
 from base_core.framework.concurrency.interfaces import ITaskRunner
-
-
-TOPIC_SPECTRUM_ARRIVED = "io.spectrum_arrived"
-TOPIC_ACQ_ERROR = "io.acquisition_error"
-
-
-@dataclass(frozen=True)
-class SpectrumArrived:
-    timestamp: float
-    device_index: int
 
 
 class SpectrometerAcquisitionService(ServiceBase):
@@ -110,8 +100,8 @@ class SpectrometerAcquisitionService(ServiceBase):
 
         # Trigger only (no heavy work here!)
         self._bus.publish(
-            TOPIC_SPECTRUM_ARRIVED,
-            SpectrumArrived(timestamp=frame.timestamp, device_index=frame.device_index),
+            TOPIC_NEW_SPECTRUM,
+            NewSpectrumEventArgs(timestamp=frame.timestamp, device_index=frame.device_index),
         )
 
     def _on_error(self, e: BaseException) -> None:

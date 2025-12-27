@@ -1,7 +1,7 @@
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QMenu
 from base_qt.views.bases.menu_view_base import MenuViewBase
-from phase_control.app.menu_bar_VM import MenuBarViewModel
+from phase_control.app.ui.menu_bar_VM import MenuBarViewModel
 
 class MenuBarView(MenuViewBase[MenuBarViewModel]):
     """

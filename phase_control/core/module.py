@@ -3,7 +3,10 @@ from __future__ import annotations
 
 from base_core.framework.modules import BaseModule
 from phase_control.app.module import AppModule
-from phase_control.core.plotting.spectrum_plot_VM import PlotVM
+from phase_control.core.plotting.spectrum_plot_VM import SpectrumPlotVM
+from phase_control.io.frame_buffer import FrameBuffer
+from base_qt.app.interfaces import IUiDispatcher
+
 
 
 class CoreModule(BaseModule):
@@ -12,5 +15,5 @@ class CoreModule(BaseModule):
 
     def register(self, c, ctx) -> None:
         
-        c.register_factory(PlotVM, lambda c: PlotVM())
+        c.register_factory(SpectrumPlotVM, lambda c: SpectrumPlotVM(c.get(IUiDispatcher), ctx.event_bus, c.get(FrameBuffer)))
         

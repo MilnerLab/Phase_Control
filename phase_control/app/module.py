@@ -8,10 +8,10 @@ from base_qt.views.registry.enums import ViewKind
 from base_qt.views.registry.interfaces import IViewRegistry
 from base_qt.views.registry.models import ViewSpec
 from base_qt.views.registry.view_registry import ViewRegistry
-from phase_control.app.main_window_view import MainWindowView
-from phase_control.app.main_window_vm import MainWindowViewModel
-from phase_control.app.menu_bar_VM import MenuBarViewModel
-from phase_control.app.menu_bar_view import MenuBarView
+from phase_control.app.ui.main_window_view import MainWindowView
+from phase_control.app.ui.main_window_vm import MainWindowViewModel
+from phase_control.app.ui.menu_bar_VM import MenuBarViewModel
+from phase_control.app.ui.menu_bar_view import MenuBarView
 
 
 class AppModule(BaseModule):

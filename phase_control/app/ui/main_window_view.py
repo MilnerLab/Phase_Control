@@ -17,7 +17,7 @@ from PySide6.QtWidgets import (
 from base_qt.views.bases.main_window_view_base import MainWindowViewBase
 from base_qt.views.bases.view_base import ViewBase
 from base_qt.views.registry.interfaces import IViewRegistry
-from phase_control.app.main_window_vm import MainWindowViewModel
+from phase_control.app.ui.main_window_vm import MainWindowViewModel
 
 
 class MainWindowView(MainWindowViewBase[MainWindowViewModel]):
@@ -61,39 +61,25 @@ class MainWindowView(MainWindowViewBase[MainWindowViewModel]):
         grid.addWidget(left, 0, 0)
         grid.addWidget(right, 0, 1)
         root.addLayout(grid)
-
+        
         # --- Single-page host -------------------------------------------
-        self._stack = QStackedWidget(self.central)
-        root.addWidget(self._stack, 1)
+        self._page_host = QWidget(self.central)
+        self._page_host_layout = QVBoxLayout(self._page_host)
+        self._page_host_layout.setContentsMargins(0, 0, 0, 0)
+        self._page_host_layout.setSpacing(0)
+
+        root.addWidget(self._page_host, 1)
+
 
     def bind(self) -> None:
         super().bind()
-        
         self._fill_combo_box()
-        self.vm.selected_page_changed.connect(self._show_page)
 
-        self._module_box.currentIndexChanged.connect(self._on_combo_changed)
-        self._btn_run.clicked.connect(self.vm.run_selected_module)
-        self._btn_reset.clicked.connect(self.vm.reset_selected_module)
+        self.connect_binding(self.vm.selected_page_changed, self._show_page)
 
-    def unbind(self) -> None:
-        try:
-            self.vm.selected_page_changed.disconnect(self._show_page)
-        except (TypeError, RuntimeError):
-            pass
-
-        try:
-            self._module_box.currentIndexChanged.disconnect(self._on_combo_changed)
-        except (TypeError, RuntimeError):
-            pass
-
-        try:
-            self._btn_run.clicked.disconnect(self.vm.run_selected_module)
-            self._btn_reset.clicked.disconnect(self.vm.reset_selected_module)
-        except (TypeError, RuntimeError):
-            pass
-
-        super().unbind()
+        self.connect_binding(self._module_box.currentIndexChanged, self._on_combo_changed)
+        self.connect_binding(self._btn_run.clicked, self.vm.run_selected_module)
+        self.connect_binding(self._btn_reset.clicked, self.vm.reset_selected_module)
 
     # ---------------- internals ----------------
 
@@ -105,21 +91,16 @@ class MainWindowView(MainWindowViewBase[MainWindowViewModel]):
 
     @Slot(ViewBase)
     def _show_page(self, page: ViewBase) -> None:
-        if self._current_page is not None:
-            try:
-                self._current_page.unbind()  
-            except Exception:
-                pass
-        
-        self._stack.addWidget(page)
-        self._stack.setCurrentWidget(page)
+        old = self._current_page
+        if old is not None:
+            self._page_host_layout.removeWidget(old)
+            old.close()
+            self._current_page = None
+
+        page.setParent(self._page_host)
+        self._page_host_layout.addWidget(page)
         self._current_page = page
 
-        try:
-            page.bind()  
-        except Exception:
-            pass
-        
     def _fill_combo_box(self):
         self._module_box.blockSignals(True)
         try:
@@ -130,3 +111,8 @@ class MainWindowView(MainWindowViewBase[MainWindowViewModel]):
 
         finally:
             self._module_box.blockSignals(False)
+            
+    def closeEvent(self, event):
+        if self._current_page is not None:
+            self._current_page.close()
+        return super().closeEvent(event)
