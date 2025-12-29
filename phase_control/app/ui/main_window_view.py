@@ -22,7 +22,7 @@ from phase_control.app.ui.main_window_vm import MainWindowViewModel
 
 class MainWindowView(MainWindowViewBase[MainWindowViewModel]):
     def __init__(self, vm: MainWindowViewModel, registry: IViewRegistry):
-        self._current_page: Optional[ViewBase] = None
+        self._shown_page: Optional[ViewBase] = None
         super().__init__(vm, registry, title="Phase Control")
 
     def build_ui(self) -> None:
@@ -38,6 +38,7 @@ class MainWindowView(MainWindowViewBase[MainWindowViewModel]):
         self._module_label = QLabel("Module", self.central)
         self._module_box = QComboBox(self.central)
         self._btn_run = QPushButton("Run", self.central)
+        self._btn_stop = QPushButton("Stop", self.central)
         self._btn_reset = QPushButton("Reset", self.central)
 
         # two equal columns
@@ -56,6 +57,7 @@ class MainWindowView(MainWindowViewBase[MainWindowViewModel]):
         right_lay.setContentsMargins(0, 0, 0, 0)
         right_lay.setSpacing(8)
         right_lay.addWidget(self._btn_run)
+        right_lay.addWidget(self._btn_stop)
         right_lay.addWidget(self._btn_reset)
 
         grid.addWidget(left, 0, 0)
@@ -79,6 +81,7 @@ class MainWindowView(MainWindowViewBase[MainWindowViewModel]):
 
         self.connect_binding(self._module_box.currentIndexChanged, self._on_combo_changed)
         self.connect_binding(self._btn_run.clicked, self.vm.run_selected_module)
+        self.connect_binding(self._btn_stop.clicked, self.vm.stop_selected_module)
         self.connect_binding(self._btn_reset.clicked, self.vm.reset_selected_module)
 
     # ---------------- internals ----------------
@@ -89,17 +92,17 @@ class MainWindowView(MainWindowViewBase[MainWindowViewModel]):
         if page_id is not None:
             self.vm.select_page(str(page_id))
 
-    @Slot(ViewBase)
-    def _show_page(self, page: ViewBase) -> None:
-        old = self._current_page
+    @Slot()
+    def _show_page(self) -> None:
+        old = self._shown_page
         if old is not None:
             self._page_host_layout.removeWidget(old)
             old.close()
-            self._current_page = None
+            self._shown_page = None
 
-        page.setParent(self._page_host)
-        self._page_host_layout.addWidget(page)
-        self._current_page = page
+        self.vm.current_page.setParent(self._page_host)
+        self._page_host_layout.addWidget(self.vm.current_page)
+        self._shown_page = self.vm.current_page
 
     def _fill_combo_box(self):
         self._module_box.blockSignals(True)
@@ -113,6 +116,6 @@ class MainWindowView(MainWindowViewBase[MainWindowViewModel]):
             self._module_box.blockSignals(False)
             
     def closeEvent(self, event):
-        if self._current_page is not None:
-            self._current_page.close()
+        if self._shown_page is not None:
+            self._shown_page.close()
         return super().closeEvent(event)

@@ -5,11 +5,12 @@ from PySide6.QtWidgets import QPushButton, QHBoxLayout, QVBoxLayout, QWidget
 
 from base_qt.views.bases.view_base import ViewBase
 from phase_control.analysis_modules.stabilization.ui.stabiliation_page_VM import StabilizationPageVM
+from phase_control.core.analysis_modules.views.interfaces import IRunnableView
 from phase_control.core.plotting.spectrum_plot_view import SpectrumPlotView
 
 
 
-class StabilizationPageView(ViewBase[StabilizationPageVM]):
+class StabilizationPageView(ViewBase[StabilizationPageVM], IRunnableView):
     def build_ui(self) -> None:
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)

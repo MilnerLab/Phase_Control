@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 
-from phase_control.core.services.enums import ServiceState
+from phase_control.core.analysis_modules.services.enums import ServiceState
 
 
 class ServiceBase(ABC):
     def __init__(self) -> None:
-        self._state = ServiceState.STOPPED
+        self._state = ServiceState.NEW
 
     @property
     def is_running(self) -> bool:
@@ -20,3 +20,8 @@ class ServiceBase(ABC):
         if not self.is_running:
             return
         self._state = ServiceState.STOPPED
+
+    def reset(self) -> None:
+        if not self.is_running:
+            return
+        self._state = ServiceState.NEW

@@ -15,30 +15,36 @@ from phase_control.app.events import TOPIC_SHELL_RESET, TOPIC_SHELL_RUN
 
 
 class MainWindowViewModel(QObject):
-    selected_page_changed = Signal(ViewBase)
+    selected_page_changed = Signal()
 
     def __init__(self, registry: IViewRegistry, event_bus: EventBus) -> None:
         super().__init__()
         self._registry = registry
         self._bus = event_bus
 
-        self._pages: List[ViewSpec] = []
+        self._page_specs: List[ViewSpec] = []
         self._selected_id: Optional[str] = None
+        self._current_page: Optional[ViewBase] = None
 
         self._load_pages()
         
     @property
-    def pages(self) -> List[ViewSpec]:
-        return self._pages
+    def current_page(self) -> ViewBase:
+        return self._current_page
     
     def select_page(self, page_id: str) -> None:
         if self._selected_id == page_id:
             return
         self._selected_id = page_id
-        page = next(s for s in self._pages if s.id == page_id)
-        self.selected_page_changed.emit(page.factory())
+        self._current_page = next(s for s in self._page_specs if s.id == page_id)
+        self.selected_page_changed.emit()
 
     def run_selected_module(self) -> None:
+        if self._selected_id is None:
+            return
+        self._bus.publish(TOPIC_SHELL_RUN, self._selected_id)
+        
+    def stop_selected_module(self) -> None:
         if self._selected_id is None:
             return
         self._bus.publish(TOPIC_SHELL_RUN, self._selected_id)
@@ -54,4 +60,4 @@ class MainWindowViewModel(QObject):
             if spec.kind == ViewKind.PAGE:
                 pages.append(spec)
 
-        self._pages = pages
+        self._page_specs = pages

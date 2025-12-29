@@ -7,6 +7,7 @@ from PySide6.QtCore import QObject, Signal, Slot
 
 from base_core.framework.events.event_bus import EventBus
 from base_qt.view_models.vm_base import VMBase
+from phase_control.core.analysis_modules.view_models.interfaces import IRunnableVM
 from phase_control.core.plotting.spectrum_plot_VM import SpectrumPlotVM
 from phase_control.io.frame_buffer import FrameBuffer
 
@@ -14,7 +15,7 @@ from phase_control.io.frame_buffer import FrameBuffer
 TOPIC_SPECTRUM_ARRIVED = "io.spectrum_arrived"
 
 
-class StabilizationPageVM(VMBase):
+class StabilizationPageVM(VMBase, IRunnableVM):
     """
     Qt VM (ok): subscribes to EventBus and emits PlotVM updates.
     Services stay Qt-free; VM does dispatch via Signals/PlotVM.
@@ -29,6 +30,12 @@ class StabilizationPageVM(VMBase):
         
         self._snap_idx = 0
     
+    def run(self) -> None:
+        return
+    def stop(self) -> None:
+        return
+    def reset(self) -> None:
+        return
 
     @Slot()
     def snapshot(self) -> None:
