@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from argparse import OPTIONAL
 from dataclasses import dataclass
 from typing import Callable, List, Optional
 
@@ -10,7 +11,7 @@ from base_qt.views.bases.view_base import ViewBase
 from base_qt.views.registry.enums import ViewKind
 from base_qt.views.registry.interfaces import IViewRegistry
 from base_qt.views.registry.models import ViewSpec
-from phase_control.app.events import TOPIC_SHELL_RESET, TOPIC_SHELL_RUN
+from phase_control.core.analysis_modules.view_models.interfaces import IRunnableVM
 
 
 
@@ -29,7 +30,7 @@ class MainWindowViewModel(QObject):
         self._load_pages()
         
     @property
-    def current_page(self) -> ViewBase:
+    def current_page(self) -> Optional[ViewBase]:
         return self._current_page
     
     def select_page(self, page_id: str) -> None:
@@ -42,18 +43,18 @@ class MainWindowViewModel(QObject):
     def run_selected_module(self) -> None:
         if self._selected_id is None:
             return
-        self._bus.publish(TOPIC_SHELL_RUN, self._selected_id)
+        self._get_vm().run()
         
     def stop_selected_module(self) -> None:
         if self._selected_id is None:
             return
-        self._bus.publish(TOPIC_SHELL_RUN, self._selected_id)
-
+        self._get_vm().stop()
+        
     def reset_selected_module(self) -> None:
         if self._selected_id is None:
             return
-        self._bus.publish(TOPIC_SHELL_RESET, self._selected_id)
-    
+        self._get_vm().reset()
+        
     def _load_pages(self) -> None:
         pages: List[ViewSpec] = []
         for spec in self._registry.list():
@@ -61,3 +62,10 @@ class MainWindowViewModel(QObject):
                 pages.append(spec)
 
         self._page_specs = pages
+
+    def _get_vm(self) -> IRunnableVM:
+        vm = self._current_page.vm
+        if (vm is not None and isinstance(vm, IRunnableVM)):
+            return vm
+        else:
+            raise ValueError("View Model is not IRunnableVM")

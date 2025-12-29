@@ -19,8 +19,8 @@ import json
 import subprocess
 from typing import Iterator, Optional
 
+from phase_control.io.spectrometer.models import StreamFrame, StreamMeta
 from spm_002.config import PYTHON32_PATH
-from phase_control.io.models import StreamMeta, StreamFrame
 
 
 class SpectrometerStreamClient:

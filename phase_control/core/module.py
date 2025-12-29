@@ -4,8 +4,8 @@ from __future__ import annotations
 from base_core.framework.modules import BaseModule
 from phase_control.app.module import AppModule
 from phase_control.core.plotting.spectrum_plot_VM import SpectrumPlotVM
-from phase_control.io.frame_buffer import FrameBuffer
 from base_qt.app.interfaces import IUiDispatcher
+from phase_control.io.spectrometer.frame_buffer import FrameBuffer
 
 
 

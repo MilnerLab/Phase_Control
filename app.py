@@ -37,6 +37,7 @@ def build_context() -> AppContext:
     ctx = AppContext(
         config={
             "app_name": "Your App",
+            "rotator_port": "COM6",
         },
         log=log,
         event_bus=bus,
@@ -51,7 +52,7 @@ def build_container(ctx: AppContext) -> Container:
 
     c.register_instance(AppContext, ctx)
 
-    io_exec = ThreadPoolExecutor(max_workers=1, thread_name_prefix="io")
+    io_exec = ThreadPoolExecutor(max_workers=2, thread_name_prefix="io")
     cpu_exec = ThreadPoolExecutor(max_workers=1, thread_name_prefix="cpu") 
 
     c.register_singleton(IIoTaskRunner, lambda c: TaskRunner(io_exec))

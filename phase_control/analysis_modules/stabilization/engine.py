@@ -8,12 +8,13 @@ import numpy as np
 
 from base_core.math.functions import usCFG_projection
 from base_core.math.models import Angle
+from phase_control.analysis_modules.stabilization.config import AnalysisConfig
+from phase_control.analysis_modules.stabilization.domain.phase_corrector import PhaseCorrector
+from phase_control.analysis_modules.stabilization.domain.phase_tracker import PhaseTracker
+from phase_control.core.analysis_modules.services.service_base import ServiceBase
 from phase_control.core.models import Spectrum
 from phase_control.core.rotator.rotator_worker import RotatorWorker
 from phase_control.io.interfaces import IFrameBuffer
-from phase_control.modules.stabilization.config import AnalysisConfig
-from phase_control.modules.stabilization.domain.phase_corrector import PhaseCorrector
-from phase_control.modules.stabilization.domain.phase_tracker import PhaseTracker
 
 @dataclass
 class AnalysisPlotResult:
@@ -30,7 +31,7 @@ class AnalysisPlotResult:
     spectrum: Spectrum
 
 
-class AnalysisEngine:
+class AnalysisEngine(ServiceBase):
     def __init__(
         self,
         config: AnalysisConfig,

@@ -5,15 +5,15 @@ from typing import Optional
 
 from base_core.framework.concurrency.models import StreamHandle
 from base_core.framework.events import EventBus
-from phase_control.core.services.service_base import ServiceBase
+from base_core.framework.services.runnable_service_base import RunnableServiceBase
 from phase_control.io.events import TOPIC_ACQ_ERROR, TOPIC_NEW_SPECTRUM, NewSpectrumEventArgs
-from phase_control.io.frame_buffer import FrameBuffer
-from phase_control.io.stream_client import SpectrometerStreamClient
+from phase_control.io.spectrometer.frame_buffer import FrameBuffer
+from phase_control.io.spectrometer.stream_client import SpectrometerStreamClient
 
 from base_core.framework.concurrency.interfaces import ITaskRunner
 
 
-class SpectrometerAcquisitionService(ServiceBase):
+class SpectrometerAcquisitionService(RunnableServiceBase):
     def __init__(
         self,
         io: ITaskRunner,

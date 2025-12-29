@@ -1,9 +1,10 @@
 from base_core.framework.modules import BaseModule
 from phase_control.app.module import AppModule
 from phase_control.core.concurrency.runners import IIoTaskRunner
-from phase_control.io.frame_buffer import FrameBuffer
-from phase_control.io.service import SpectrometerAcquisitionService
-from phase_control.io.stream_client import SpectrometerStreamClient
+from phase_control.io.rotator.rotator_worker import RotatorController
+from phase_control.io.spectrometer.frame_buffer import FrameBuffer
+from phase_control.io.spectrometer.acquisition_service import SpectrometerAcquisitionService
+from phase_control.io.spectrometer.stream_client import SpectrometerStreamClient
 
 
 class IOModule(BaseModule):
@@ -21,9 +22,17 @@ class IOModule(BaseModule):
                 client=c.get(SpectrometerStreamClient),
             ),
         )
+        
+        c.register_singleton(
+            RotatorController,
+            lambda c: RotatorController(
+                port="COM6",
+                io=c.get(IIoTaskRunner)))
 
     def on_startup(self, c, ctx) -> None:
         c.get(SpectrometerAcquisitionService).start()
+        c.get(RotatorController).open()
 
     def on_shutdown(self, c, ctx) -> None:
+        c.get(RotatorController).close()
         c.get(SpectrometerAcquisitionService).stop()
