@@ -28,7 +28,6 @@
     ]
   },
   "settings": {
-    "python.defaultInterpreterPath": "${workspaceFolder:Phase_Control}/.venv/bin/python",
     "python.analysis.indexing": true,
     "python.analysis.autoImportCompletions": true,
     "python.analysis.extraPaths": [
