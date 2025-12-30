@@ -197,8 +197,7 @@ class AnalysisEngine(RunnableServiceBase):
                 dtype=float,
             )
         except Exception:
-            y_fit_arr = None
-            y_zero_arr = None
+            raise ValueError()
         
         correction_angle = self._phase_corrector.update(current_phase)
         self._rotator.request_rotation(correction_angle)
