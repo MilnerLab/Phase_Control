@@ -151,12 +151,10 @@ class AnalysisEngine(RunnableServiceBase):
                 cb(res)
             except Exception:
                 import traceback
-                traceback.print_exc()   # hier OK, wir sind im except
+                traceback.print_exc()  
         except Exception:
             import traceback
             traceback.print_exc()
-
-
 
     def _on_error(self, e: BaseException) -> None:
         # optional: publish/log error
@@ -214,7 +212,10 @@ class AnalysisEngine(RunnableServiceBase):
         correction_angle = self._phase_corrector.update(current_phase)
         self._rotator.request_rotation(correction_angle)
         
-        return {
-                "zero": Spectrum(x, y_zero_arr),
-                "fit": Spectrum (x, y_fit_arr),
-            }
+        out: dict[str, Spectrum] = {}
+        if y_zero_arr is not None:
+            out["zero"] = Spectrum(x, y_zero_arr)
+        if y_fit_arr is not None:
+            out["fit"] = Spectrum(x, y_fit_arr)
+        
+        return out
