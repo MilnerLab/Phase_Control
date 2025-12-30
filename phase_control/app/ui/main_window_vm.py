@@ -6,12 +6,12 @@ from typing import Callable, List, Optional
 
 from PySide6.QtCore import QObject, Signal
 
+from base_core.framework.domain.interfaces import IRunnable
 from base_core.framework.events.event_bus import EventBus
 from base_qt.views.bases.view_base import ViewBase
 from base_qt.views.registry.enums import ViewKind
 from base_qt.views.registry.interfaces import IViewRegistry
 from base_qt.views.registry.models import ViewSpec
-from phase_control.core.analysis_modules.view_models.interfaces import IRunnableVM
 
 
 
@@ -37,7 +37,7 @@ class MainWindowViewModel(QObject):
         if self._selected_id == page_id:
             return
         self._selected_id = page_id
-        self._current_page = next(s for s in self._page_specs if s.id == page_id)
+        self._current_page = next(s for s in self._page_specs if s.id == page_id).factory()
         self.selected_page_changed.emit()
 
     def run_selected_module(self) -> None:
@@ -63,9 +63,9 @@ class MainWindowViewModel(QObject):
 
         self._page_specs = pages
 
-    def _get_vm(self) -> IRunnableVM:
+    def _get_vm(self) -> IRunnable:
         vm = self._current_page.vm
-        if (vm is not None and isinstance(vm, IRunnableVM)):
+        if (vm is not None and isinstance(vm, IRunnable)):
             return vm
         else:
-            raise ValueError("View Model is not IRunnableVM")
+            raise ValueError("View Model is not IRunnable")

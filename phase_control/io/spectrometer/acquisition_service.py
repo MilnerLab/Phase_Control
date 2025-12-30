@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from re import I
 import threading
 from typing import Optional
 
@@ -7,7 +8,7 @@ from base_core.framework.concurrency.models import StreamHandle
 from base_core.framework.events import EventBus
 from base_core.framework.services.runnable_service_base import RunnableServiceBase
 from phase_control.io.events import TOPIC_ACQ_ERROR, TOPIC_NEW_SPECTRUM, NewSpectrumEventArgs
-from phase_control.io.spectrometer.frame_buffer import FrameBuffer
+from phase_control.io.spectrometer.interfaces import IFrameBuffer
 from phase_control.io.spectrometer.stream_client import SpectrometerStreamClient
 
 from base_core.framework.concurrency.interfaces import ITaskRunner
@@ -18,7 +19,7 @@ class SpectrometerAcquisitionService(RunnableServiceBase):
         self,
         io: ITaskRunner,
         bus: EventBus,
-        buffer: FrameBuffer,
+        buffer: IFrameBuffer,
         client: SpectrometerStreamClient,
     ) -> None:
         super().__init__()

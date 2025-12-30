@@ -4,9 +4,9 @@ from __future__ import annotations
 from typing import Optional
 
 from phase_control.core.models import Spectrum
-from phase_control.io.interfaces import IFrameBuffer
-from phase_control.io.models import StreamFrame, StreamMeta
 from base_core.framework.concurrency.buffer import Buffer
+from phase_control.io.spectrometer.interfaces import IFrameBuffer
+from phase_control.io.spectrometer.models import StreamFrame, StreamMeta
 
 
 class FrameBuffer(IFrameBuffer, Buffer[StreamFrame]):

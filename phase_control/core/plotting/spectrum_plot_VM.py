@@ -8,8 +8,8 @@ from PySide6.QtCore import Signal
 from base_core.framework.events import EventBus
 from base_qt.view_models.thread_safe_vm_base import ThreadSafeVMBase, ui_thread
 from phase_control.io.events import TOPIC_NEW_SPECTRUM
-from phase_control.io.frame_buffer import FrameBuffer
 from base_qt.app.interfaces import IUiDispatcher
+from phase_control.io.spectrometer.frame_buffer import FrameBuffer
 
 
 class SpectrumPlotVM(ThreadSafeVMBase):

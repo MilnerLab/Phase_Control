@@ -100,7 +100,6 @@ class MainWindowView(MainWindowViewBase[MainWindowViewModel]):
             old.close()
             self._shown_page = None
 
-        self.vm.current_page.setParent(self._page_host)
         self._page_host_layout.addWidget(self.vm.current_page)
         self._shown_page = self.vm.current_page
 
@@ -109,7 +108,7 @@ class MainWindowView(MainWindowViewBase[MainWindowViewModel]):
         try:
             self._module_box.clear()
             self._module_box.addItem("", "test") 
-            for spec in self.vm.pages:
+            for spec in self.vm._page_specs:
                 self._module_box.addItem(spec.title, spec.id) 
 
         finally:
