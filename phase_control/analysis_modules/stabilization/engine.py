@@ -137,22 +137,25 @@ class AnalysisEngine(RunnableServiceBase):
             yield spec
             
     def _on_spectrum(self, spec: Spectrum) -> None:
-        res = self.step(spec)
-        if res is None:
-            return
-
-        with self._cb_lock:
-            cb = self._on_result
-
-        if cb is None:
-            return
-
         try:
-            cb(res)
-        except Exception as e:
-            # mindestens loggen, aber NICHT den Stream sterben lassen
+            res = self.step(spec)
+            if res is None:
+                return
+
+            with self._cb_lock:
+                cb = self._on_result
+            if cb is None:
+                return
+
+            try:
+                cb(res)
+            except Exception:
+                import traceback
+                traceback.print_exc()   # hier OK, wir sind im except
+        except Exception:
             import traceback
-        traceback.print_exc()
+            traceback.print_exc()
+
 
 
     def _on_error(self, e: BaseException) -> None:
