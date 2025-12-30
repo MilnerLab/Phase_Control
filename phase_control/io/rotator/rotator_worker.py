@@ -17,8 +17,10 @@ class RotatorController(IRotatorController):
         return True
     
     def open(self):
-        self._runner.run(lambda: self._ensure_open(), key="rotator")
-        self._runner.run(lambda: self._ensure_open().home, key="rotator")
+        def work() -> None:
+            r = self._ensure_open()
+            r.home()
+        self._runner.run(lambda: work, key="rotator")
         
     def close(self):
         self._runner.run(lambda: self._ensure_open().close, key="rotator")

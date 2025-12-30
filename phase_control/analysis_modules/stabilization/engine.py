@@ -135,6 +135,7 @@ class AnalysisEngine(RunnableServiceBase):
                 break
 
             yield spec
+            
     def _on_spectrum(self, spec: Spectrum) -> None:
         res = self.step(spec)
         if res is None:
