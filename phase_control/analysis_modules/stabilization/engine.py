@@ -21,20 +21,6 @@ from phase_control.io.events import TOPIC_NEW_SPECTRUM
 from phase_control.io.rotator.interfaces import IRotatorController
 from phase_control.io.spectrometer.interfaces import IFrameBuffer
 
-# importier das aus deinem IO-Modul / topics file
-# from phase_control.io.spectrometer.topics import TOPIC_NEW_SPECTRUM
-
-@dataclass
-class AnalysisPlotResult:
-    x: np.ndarray
-    y_current: np.ndarray
-    y_fit: Optional[np.ndarray]
-    y_zero_phase: Optional[np.ndarray]
-    current_phase: Optional[Angle]
-    correction_angle: Optional[Angle]
-    spectrum: Spectrum
-
-
 class AnalysisEngine(RunnableServiceBase):
     def __init__(
         self,
@@ -74,7 +60,7 @@ class AnalysisEngine(RunnableServiceBase):
     # -------------------------------------------------------------- #
     # public API
     # -------------------------------------------------------------- #
-    def set_on_result(self, cb: Optional[Callable[[AnalysisPlotResult], None]]) -> None:
+    def set_on_result(self, cb: Optional[Callable[[dict[str, Spectrum]], None]]) -> None:
         with self._cb_lock:
             self._on_result = cb
 
