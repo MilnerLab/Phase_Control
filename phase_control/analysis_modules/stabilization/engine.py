@@ -30,7 +30,6 @@ class AnalysisEngine(RunnableServiceBase):
         rotator_worker: IRotatorController,
         bus: EventBus,
         cpu: ITaskRunner,
-        poll_interval_s: float = 0.01,
     ) -> None:
         super().__init__()
         self.config = config
@@ -38,7 +37,7 @@ class AnalysisEngine(RunnableServiceBase):
         self._rotator = rotator_worker
         self._bus = bus
         self._cpu = cpu
-        self._poll = poll_interval_s
+        self._poll = 0.01
 
         self._phase_tracker = PhaseTracker(cast(AnalysisConfig, self.config))
         self._phase_corrector = PhaseCorrector()

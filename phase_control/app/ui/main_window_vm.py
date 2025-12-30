@@ -43,7 +43,7 @@ class MainWindowViewModel(QObject):
     def run_selected_module(self) -> None:
         if self._selected_id is None:
             return
-        self._get_vm().run()
+        self._get_vm().start()
         
     def stop_selected_module(self) -> None:
         if self._selected_id is None:
