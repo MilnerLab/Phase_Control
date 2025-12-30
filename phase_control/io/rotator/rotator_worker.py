@@ -8,36 +8,42 @@ class RotatorController(IRotatorController):
     def __init__(self, port: str, io: ITaskRunner):
         self._port = port
         self._runner = io
-        self._rotator = None 
-         
+        self._rotator: Rotator | None = None
+
     @property
     def is_busy(self) -> bool:
-        if (self._rotator is None or self._rotator.status == StatusCode.OK):
+        r = self._rotator
+        if r is None:
             return False
-        return True
-    
-    def open(self):
+        return r.status != StatusCode.OK
+
+    def open(self) -> None:
         def work() -> None:
             r = self._ensure_open()
             r.home()
-        self._runner.run(lambda: work, key="rotator")
-        
-    def close(self):
-        self._runner.run(lambda: self._ensure_open().close, key="rotator")
+        self._runner.run(work, key="rotator.open", cancel_previous=True)
+
+    def close(self) -> None:
+        def work() -> None:
+            if self._rotator is not None:
+                self._rotator.close()
+        self._runner.run(work, key="rotator.close", cancel_previous=True)
         self._rotator = None
-        
-    def _ensure_open(self):
+
+    def _ensure_open(self) -> Rotator:
         if self._rotator is None:
             r = Rotator(port=self._port)
             r.open()
             self._rotator = r
         return self._rotator
 
-    def request_rotation(self, angle):
-        if angle != 0:
-            self._runner.run(
-                lambda: self._ensure_open().rotate(angle),
-                key="rotator",
-                cancel_previous=True,
-                drop_outdated=True,
-            )
+    def request_rotation(self, angle) -> None:
+        if angle == 0:
+            return
+
+        self._runner.run(
+            lambda: self._ensure_open().rotate(angle),
+            key="rotator.rotate",
+            cancel_previous=True,
+            drop_outdated=True,
+        )
