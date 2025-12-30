@@ -39,10 +39,9 @@ class StabilizationPageVM(RunnableVMBase):
     def _on_new_result(self, spectra: dict[str, Spectrum]) -> None:
         for key, spec in spectra.items():
 
-            x = spec.wavelengths_nm.copy()
             y = spec.intensity.copy()
 
-            self.plot_vm.apply_spectrum(x, y, key)  
+            self.plot_vm.apply_spectrum([], y, key)  
  
         
     @Slot()

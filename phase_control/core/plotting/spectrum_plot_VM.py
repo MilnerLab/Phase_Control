@@ -3,6 +3,9 @@ from __future__ import annotations
 from re import I
 from typing import Callable, Dict, Optional
 
+from base_core.math.models import Range
+from base_core.quantities.enums import Prefix
+from base_core.quantities.models import Length
 import numpy as np
 from PySide6.QtCore import Signal
 
@@ -71,6 +74,7 @@ class SpectrumPlotVM(ThreadSafeVMBase):
         spec = self._buffer.get_latest()
         if spec is None:
             return
-        x = spec.wavelengths_nm.copy()
-        y = spec.intensity.copy()
+        cut = spec.cut(Range(Length(800, Prefix.NANO), Length(805, Prefix.NANO)))
+        x = cut.wavelengths_nm.copy()
+        y = cut.intensity.copy()
         self.apply_spectrum(x, y, "live")  
