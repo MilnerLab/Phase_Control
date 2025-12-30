@@ -32,8 +32,8 @@ class RotatorController(IRotatorController):
 
     def _ensure_open(self) -> Rotator:
         if self._rotator is None:
-            r = Rotator(port=self._port)
-            r.open()
+            r = Rotator()
+            r.open(port=self._port)
             self._rotator = r
         return self._rotator
 

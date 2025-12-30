@@ -90,7 +90,7 @@ class AnalysisEngine(RunnableServiceBase):
         if self._unsub:
             self._unsub()
             self._unsub = None
-        self._pending.clear()
+        self._pending_event.clear()
         
     def reset(self) -> None:
         # keep subscriptions/stream running (if you want), but reset analysis state
@@ -106,29 +106,29 @@ class AnalysisEngine(RunnableServiceBase):
             return
         with self._pending_lock:
             self._latest = spec
-        self._pending.set()
+        self._pending_event.set()
 
     def _producer(self, stop: threading.Event):
         while not stop.is_set():
-            if not self._pending.wait(timeout=0.1):
+            if not self._pending_event.wait(timeout=0.1):
                 continue
 
             # take newest spectrum (coalesce)
             with self._pending_lock:
                 spec = self._latest
                 self._latest = None
-                self._pending.clear()
+                self._pending_event.clear()
 
             if spec is None:
                 continue
 
             # wait for rotator idle; while waiting, keep coalescing newest spectrum
             while self._rotator.is_busy and not stop.is_set():
-                if self._pending.is_set():
+                if self._pending_event.is_set():
                     with self._pending_lock:
                         spec = self._latest or spec
                         self._latest = None
-                        self._pending.clear()
+                        self._pending_event.clear()
                 time.sleep(0.01)
 
             if stop.is_set():
@@ -173,7 +173,6 @@ class AnalysisEngine(RunnableServiceBase):
         spectrum = spectrum.cut(self.config.wavelength_range)
 
         x = np.asarray(spectrum.wavelengths_nm, dtype=float)
-        y_current = np.asarray(spectrum.intensity, dtype=float)
 
         self._phase_tracker.update(spectrum)
         current_phase: Optional[Angle] = self._phase_tracker.current_phase
