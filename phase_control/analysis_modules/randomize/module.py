@@ -12,7 +12,6 @@ from phase_control.core.module import CoreModule
 from phase_control.core.plotting.spectrum_plot_VM import SpectrumPlotVM
 from phase_control.io.rotator.interfaces import IRotatorController
 
-
 class RandomizationModule(BaseModule):
     name = "spectrometer"
     requires = (AppModule, CoreModule,)  

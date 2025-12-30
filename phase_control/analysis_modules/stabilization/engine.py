@@ -49,7 +49,7 @@ class AnalysisEngine(RunnableServiceBase):
         # lifecycle / concurrency
         self._lock = threading.RLock()
         self._handle: Optional[StreamHandle] = None
-        self._unsub_new_spec: Optional[Callable[[], None]] = None
+        self._unsub: Optional[Callable[[], None]] = None
 
         # gating: “new spectrum pending”
         self._pending_event = threading.Event()

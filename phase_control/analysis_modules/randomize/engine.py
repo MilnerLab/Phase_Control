@@ -65,7 +65,7 @@ class RandomizationEngine(RunnableServiceBase):
             if stop.is_set():
                 break
 
-            angle = Angle(self._sign * ROT_ANGLE, AngleUnit.DEG)
+            angle = Angle(self._sign * ROT_ANGLE)
             self._sign *= -1  # alternate sign
 
             yield angle

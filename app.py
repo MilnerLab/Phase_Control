@@ -18,6 +18,7 @@ from base_core.framework.lifecycle.cleanup_collection import CleanupCollection
 from base_core.framework.log import setup_logging
 from base_core.framework.modules import ModuleManager
 from base_qt.app.dispatcher import QtDispatcher
+from phase_control.analysis_modules.randomize.module import RandomizationModule
 from phase_control.analysis_modules.stabilization.module import StabilizationModule
 from phase_control.app.module import AppModule
 from phase_control.app.ui.main_window_view import MainWindowView
@@ -72,7 +73,8 @@ def get_modules():
         AppModule(),
         CoreModule(),
         IOModule(),
-        StabilizationModule()
+        StabilizationModule(),
+        RandomizationModule()
         # AnalysisModule(),
     ]
 
