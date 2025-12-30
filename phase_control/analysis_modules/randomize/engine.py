@@ -67,13 +67,16 @@ class RandomizationEngine(RunnableServiceBase):
 
             angle = Angle(self._sign * ROT_ANGLE)
             self._sign *= -1  # alternate sign
-
+            import threading
+            print("THREAD:", threading.current_thread().name)
             yield angle
 
     def _on_angle(self, angle: Angle) -> None:
         # keep exceptions from killing the stream
         try:
             self._rotator.request_rotation(angle)
+            import threading
+            print("THREAD:", threading.current_thread().name)
         except Exception:
             import traceback
             traceback.print_exc()

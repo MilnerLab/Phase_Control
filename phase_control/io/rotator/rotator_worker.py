@@ -29,6 +29,8 @@ class RotatorController(IRotatorController):
             if self._rotator is not None:
                 self._rotator.close()
         self._runner.run(work, key="rotator.close", cancel_previous=True)
+        import threading
+        print("THREAD:", threading.current_thread().name)
         self._rotator = None
 
     def request_rotation(self, angle: Angle) -> None:
@@ -44,7 +46,7 @@ class RotatorController(IRotatorController):
     
     def request_homing(self) -> None:
         self._runner.run(
-            lambda: self._ensure_open().home,
+            lambda: self._ensure_open().home(),
             key="rotator.home",
             cancel_previous=True,
             drop_outdated=True,
