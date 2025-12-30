@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from re import I
 from typing import Callable, Dict, Optional
 
 import numpy as np
@@ -10,6 +11,7 @@ from base_qt.view_models.thread_safe_vm_base import ThreadSafeVMBase, ui_thread
 from phase_control.io.events import TOPIC_NEW_SPECTRUM
 from base_qt.app.interfaces import IUiDispatcher
 from phase_control.io.spectrometer.frame_buffer import FrameBuffer
+from phase_control.io.spectrometer.interfaces import IFrameBuffer
 
 
 class SpectrumPlotVM(ThreadSafeVMBase):
@@ -24,7 +26,7 @@ class SpectrumPlotVM(ThreadSafeVMBase):
     series_removed = Signal(str)
     cleared = Signal()
 
-    def __init__(self, ui: IUiDispatcher, bus: EventBus, buffer: FrameBuffer) -> None:
+    def __init__(self, ui: IUiDispatcher, bus: EventBus, buffer: IFrameBuffer) -> None:
         super().__init__(ui, bus)
         self._buffer = buffer
 

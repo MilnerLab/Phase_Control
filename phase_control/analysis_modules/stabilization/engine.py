@@ -54,7 +54,7 @@ class AnalysisEngine(RunnableServiceBase):
         # gating: “new spectrum pending”
         self._pending_event = threading.Event()
         self._pending_lock = threading.Lock()
-        self._pending_payload: Any = None  # we only need “a signal”; payload optional
+        self._latest: Optional[Spectrum] = None  # we only need “a signal”; payload optional
 
     # -------------------------------------------------------------- #
     # public API
@@ -166,7 +166,7 @@ class AnalysisEngine(RunnableServiceBase):
     # -------------------------------------------------------------- #
     # Single analysis step
     # -------------------------------------------------------------- #
-    def step(self, spectrum: Spectrum) -> dict[str, Spectrum]:
+    def step(self, spectrum: Spectrum) -> Optional[dict[str, Spectrum]]:
         if spectrum is None:
             return None
 
@@ -180,29 +180,30 @@ class AnalysisEngine(RunnableServiceBase):
         y_fit_arr: Optional[np.ndarray] = None
         y_zero_arr: Optional[np.ndarray] = None
         correction_angle: Optional[Angle] = None
+        if current_phase is None:
+            return None
+        
+        try:
+            fit_kwargs = self.config.to_fit_kwargs(usCFG_projection)
+            y_fit_arr = np.asarray(
+                usCFG_projection(spectrum.wavelengths_nm, **fit_kwargs),
+                dtype=float,
+            )
 
-        if current_phase is not None:
-            try:
-                fit_kwargs = self.config.to_fit_kwargs(usCFG_projection)
-                y_fit_arr = np.asarray(
-                    usCFG_projection(spectrum.wavelengths_nm, **fit_kwargs),
-                    dtype=float,
-                )
-
-                zero_kwargs = dict(fit_kwargs)
-                zero_kwargs["phase"] = 0.0
-                y_zero_arr = np.asarray(
-                    usCFG_projection(spectrum.wavelengths_nm, **zero_kwargs),
-                    dtype=float,
-                )
-            except Exception:
-                y_fit_arr = None
-                y_zero_arr = None
-            
-            correction_angle = self._phase_corrector.update(current_phase)
-            self._rotator.request_rotation(correction_angle)
-           
-            return {
-                    "zero": Spectrum(x, y_zero_arr),
-                    "fit": Spectrum (x, y_fit_arr),
-                }
+            zero_kwargs = dict(fit_kwargs)
+            zero_kwargs["phase"] = 0.0
+            y_zero_arr = np.asarray(
+                usCFG_projection(spectrum.wavelengths_nm, **zero_kwargs),
+                dtype=float,
+            )
+        except Exception:
+            y_fit_arr = None
+            y_zero_arr = None
+        
+        correction_angle = self._phase_corrector.update(current_phase)
+        self._rotator.request_rotation(correction_angle)
+        
+        return {
+                "zero": Spectrum(x, y_zero_arr),
+                "fit": Spectrum (x, y_fit_arr),
+            }
