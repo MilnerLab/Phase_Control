@@ -1,4 +1,5 @@
 from base_core.framework.concurrency.task_runner import ITaskRunner
+from base_core.math.models import Angle
 from elliptec.base.enums import StatusCode
 from elliptec.elliptec_ell14 import Rotator
 from phase_control.io.rotator.interfaces import IRotatorController
@@ -30,14 +31,7 @@ class RotatorController(IRotatorController):
         self._runner.run(work, key="rotator.close", cancel_previous=True)
         self._rotator = None
 
-    def _ensure_open(self) -> Rotator:
-        if self._rotator is None:
-            r = Rotator()
-            r.open(port=self._port)
-            self._rotator = r
-        return self._rotator
-
-    def request_rotation(self, angle) -> None:
+    def request_rotation(self, angle: Angle) -> None:
         if angle == 0:
             return
 
@@ -47,3 +41,26 @@ class RotatorController(IRotatorController):
             cancel_previous=True,
             drop_outdated=True,
         )
+    
+    def request_homing(self) -> None:
+        self._runner.run(
+            lambda: self._ensure_open().home,
+            key="rotator.home",
+            cancel_previous=True,
+            drop_outdated=True,
+        )
+        
+    def request_set_speed(self, percent: int) -> None:
+        self._runner.run(
+            lambda: self._ensure_open().set_speed(percent),
+            key="rotator.set_speed",
+            cancel_previous=True,
+            drop_outdated=True,
+        )
+
+    def _ensure_open(self) -> Rotator:
+        if self._rotator is None:
+            r = Rotator()
+            r.open(port=self._port)
+            self._rotator = r
+        return self._rotator

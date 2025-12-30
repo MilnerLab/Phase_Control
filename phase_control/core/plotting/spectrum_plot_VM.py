@@ -24,8 +24,7 @@ class SpectrumPlotVM(ThreadSafeVMBase):
     - series count is dynamic.
     """
 
-    x_changed = Signal(object)            # np.ndarray
-    series_updated = Signal(str, object)  # key, np.ndarray(y)
+    series_updated = Signal(str, object, object) 
     series_removed = Signal(str)
     cleared = Signal()
 
@@ -33,15 +32,10 @@ class SpectrumPlotVM(ThreadSafeVMBase):
         super().__init__(ui, bus)
         self._buffer = buffer
 
-        self._x: Optional[np.ndarray] = None
         self._series: Dict[str, np.ndarray] = {}
         self._unsub: Optional[Callable[[], None]] = None
         
         self.sub_event(TOPIC_NEW_SPECTRUM, self._on_new_spectrum)
-
-    @property
-    def x(self) -> Optional[np.ndarray]:
-        return self._x
 
     @ui_thread
     def apply_spectrum(self, x: np.ndarray, y: np.ndarray, key: str) -> None:
@@ -49,12 +43,8 @@ class SpectrumPlotVM(ThreadSafeVMBase):
         x = np.asarray(x, dtype=float)
         y = np.asarray(y, dtype=float)
 
-        if self._x is None:
-            self._x = x
-            self.x_changed.emit(x)
-
         self._series[key] = y
-        self.series_updated.emit(key, y)
+        self.series_updated.emit(key, x, y)
 
     def remove_series(self, key: str) -> None:
         if key in self._series:

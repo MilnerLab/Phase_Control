@@ -38,8 +38,8 @@ class StabilizationModule(BaseModule):
 
         view_reg = c.get(IViewRegistry)
         view_reg.register(ViewSpec(
-            id="spectrometer",
-            title="Spectrometer",
+            id="stabilization",
+            title="Stabilization",
             kind=ViewKind.PAGE,
             factory=lambda: c.get(StabilizationPageView),
         ))

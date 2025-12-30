@@ -94,6 +94,7 @@ class AnalysisEngine(RunnableServiceBase):
         
     def reset(self) -> None:
         # keep subscriptions/stream running (if you want), but reset analysis state
+        super().reset()
         self._phase_tracker = PhaseTracker(self.config)
 
     # -------------------------------------------------------------- #

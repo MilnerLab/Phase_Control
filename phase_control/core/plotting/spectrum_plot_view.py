@@ -6,6 +6,7 @@ from typing import Dict, Optional
 import numpy as np
 import pyqtgraph as pg
 from PySide6.QtCore import Slot
+from shiboken6 import Object
 
 from base_qt.views.bases.view_base import ViewBase
 from phase_control.core.plotting.spectrum_plot_VM import SpectrumPlotVM
@@ -19,7 +20,6 @@ class SpectrumPlotView(ViewBase[SpectrumPlotVM]):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self._plot)
 
-        self._x: Optional[np.ndarray] = None
         self._curves: Dict[str, pg.PlotDataItem] = {}
         self._curve_order: list[str] = []
 
@@ -28,24 +28,14 @@ class SpectrumPlotView(ViewBase[SpectrumPlotVM]):
             return
         super().bind()
 
-        self.connect_binding(self.vm.x_changed, self._on_x_changed)
         self.connect_binding(self.vm.series_updated, self._on_series_updated)
         self.connect_binding(self.vm.series_removed, self._on_series_removed)
         self.connect_binding(self.vm.cleared, self._on_cleared)
 
 
-    @Slot(object)
-    def _on_x_changed(self, x: object) -> None:
-        self._x = x  # numpy array
-        # re-render existing curves with new x
-        for key, curve in self._curves.items():
-            y = curve.yData
-            if y is None:
-                continue
-            curve.setData(self._x, y)
-
     @Slot(str, object)
-    def _on_series_updated(self, key: str, y_obj: object) -> None:
+    def _on_series_updated(self, key: str, x_obj: Object, y_obj: object) -> None:
+        x = x_obj
         y = y_obj
         curve = self._curves.get(key)
         if curve is None:
@@ -54,11 +44,9 @@ class SpectrumPlotView(ViewBase[SpectrumPlotVM]):
             self._curve_order.append(key)
             # simple distinct colors without extra config
             curve.setPen(pg.intColor(len(self._curve_order) - 1))
-
-        if self._x is None:
-            curve.setData(y)
+            curve.setData(x, y)
         else:
-            curve.setData(self._x, y)
+            curve.setData(y)
 
     @Slot(str)
     def _on_series_removed(self, key: str) -> None:
