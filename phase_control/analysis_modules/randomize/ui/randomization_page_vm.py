@@ -5,10 +5,6 @@ from phase_control.core.plotting.spectrum_plot_VM import SpectrumPlotVM
 
 
 class RandomizationPageVM(RunnableVMBase):
-    """
-    Qt VM (ok): subscribes to EventBus and emits PlotVM updates.
-    Services stay Qt-free; VM does dispatch via Signals/PlotVM.
-    """
 
     def __init__(self, engine_service: RandomizationEngine, ui: IUiDispatcher, bus: EventBus, plot: SpectrumPlotVM) -> None:
         super().__init__(engine_service, ui, bus)
