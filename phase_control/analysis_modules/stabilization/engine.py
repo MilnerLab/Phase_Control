@@ -58,7 +58,7 @@ class AnalysisEngine(RunnableServiceBase):
         self._phase_corrector = PhaseCorrector()
 
         # result callback (VM sets/unsets in bind/unbind)
-        self._on_result: Optional[Callable[[AnalysisPlotResult], None]] = None
+        self._on_result: Optional[Callable[[dict[str, Spectrum]], None]] = None
         self._cb_lock = threading.Lock()
 
         # lifecycle / concurrency
@@ -180,7 +180,7 @@ class AnalysisEngine(RunnableServiceBase):
     # -------------------------------------------------------------- #
     # Single analysis step
     # -------------------------------------------------------------- #
-    def step(self, spectrum: Spectrum) -> Optional[AnalysisPlotResult]:
+    def step(self, spectrum: Spectrum) -> dict[str, Spectrum]:
         if spectrum is None:
             return None
 
@@ -216,13 +216,8 @@ class AnalysisEngine(RunnableServiceBase):
             
             correction_angle = self._phase_corrector.update(current_phase)
             self._rotator.request_rotation(correction_angle)
-
-        return AnalysisPlotResult(
-            x=x,
-            y_current=y_current,
-            y_fit=y_fit_arr,
-            y_zero_phase=y_zero_arr,
-            current_phase=current_phase,
-            correction_angle=correction_angle,
-            spectrum=spectrum,
-        )
+           
+            return {
+                    "zero": Spectrum(x, y_zero_arr),
+                    "fit": Spectrum (x, y_fit_arr),
+                }
