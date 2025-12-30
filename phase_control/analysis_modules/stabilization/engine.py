@@ -143,8 +143,17 @@ class AnalysisEngine(RunnableServiceBase):
 
         with self._cb_lock:
             cb = self._on_result
-        if cb is not None:
-            cb(res)  # runs on CPU worker thread; VM should only Signal.emit()
+
+        if cb is None:
+            return
+
+        try:
+            cb(res)
+        except Exception as e:
+            # mindestens loggen, aber NICHT den Stream sterben lassen
+            import traceback
+        traceback.print_exc()
+
 
     def _on_error(self, e: BaseException) -> None:
         # optional: publish/log error
