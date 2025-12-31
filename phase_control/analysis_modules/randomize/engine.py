@@ -19,7 +19,7 @@ class RandomizationEngine(RunnableServiceBase):
         self._rotator = rotator_worker
         self._cpu = cpu
         self._handle: Optional[StreamHandle] = None
-        self._rotation_speed: int = None
+        self._rotation_speed: int = 30
 
         self._sign = +1
         self._stop_req = threading.Event()
@@ -59,7 +59,6 @@ class RandomizationEngine(RunnableServiceBase):
         self.stop()
 
     def _producer(self, stop: threading.Event):
-        print("producer entered", "stop=", stop.is_set(), "stop_req=", self._stop_req.is_set())
         # normal loop: produce next angle only while not stopping
         while not stop.is_set() and not self._stop_req.is_set():
             while self._rotator.is_busy and not stop.is_set() and not self._stop_req.is_set():

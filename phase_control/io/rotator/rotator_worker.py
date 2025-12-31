@@ -2,6 +2,7 @@
 import threading
 from base_core.framework.concurrency.task_runner import ITaskRunner
 from base_core.math.models import Angle
+from elliptec.base.enums import StatusCode
 from elliptec.elliptec_ell14 import Rotator
 from phase_control.io.rotator.interfaces import IRotatorController
 
