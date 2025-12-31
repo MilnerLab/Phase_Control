@@ -67,7 +67,7 @@ class RandomizationEngine(RunnableServiceBase):
             if stop.is_set() or self._stop_req.is_set():
                 break
 
-            angle = Angle(self._sign * ROT_ANGLE.deg, AngleUnit.DEG)  # <- sicher
+            angle = Angle(self._sign * ROT_ANGLE)  # <- sicher
             self._sign *= -1
             yield angle
 

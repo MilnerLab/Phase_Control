@@ -26,7 +26,8 @@ class RotatorController(IRotatorController):
 
         def work() -> None:
             try:
-                self._ensure_open()
+                r = self._ensure_open()
+                r.home()
             finally:
                 self._clear_busy(gen)
 
