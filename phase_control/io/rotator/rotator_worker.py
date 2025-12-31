@@ -21,6 +21,65 @@ class RotatorController(IRotatorController):
         # IMPORTANT: no hardware / serial reads here
         return self._busy.is_set()
 
+    def open(self) -> None:
+        gen = self._mark_busy()
+
+        def work() -> None:
+            try:
+                self._ensure_open()
+            finally:
+                self._clear_busy(gen)
+
+        self._runner.run(
+            work,
+            key="rotator.open",
+            cancel_previous=True,
+            drop_outdated=True,
+        )
+
+
+    def close(self) -> None:
+        gen = self._mark_busy()
+
+        def work() -> None:
+            try:
+                if self._rotator is not None:
+                    try:
+                        self._rotator.close()
+                    finally:
+                        self._rotator = None
+            finally:
+                self._clear_busy(gen)
+
+        self._runner.run(
+            work,
+            key="rotator.close",
+            cancel_previous=True,
+            drop_outdated=True,
+        )
+
+
+    def request_restart(self) -> None:
+        gen = self._mark_busy()
+
+        def work() -> None:
+            try:
+                if self._rotator is not None:
+                    try:
+                        self._rotator.close()
+                    finally:
+                        self._rotator = None
+                self._ensure_open()
+            finally:
+                self._clear_busy(gen)
+
+        self._runner.run(
+            work,
+            key="rotator.restart",
+            cancel_previous=True,
+            drop_outdated=True,
+        )
+
     def _mark_busy(self) -> int:
         with self._busy_lock:
             self._busy_gen += 1
