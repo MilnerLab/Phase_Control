@@ -1,4 +1,5 @@
 from base_core.framework.concurrency.task_runner import ITaskRunner
+from base_core.framework.guard.guard import Guard
 from base_core.math.models import Angle
 from elliptec.base.enums import StatusCode
 from elliptec.elliptec_ell14 import Rotator
@@ -34,6 +35,7 @@ class RotatorController(IRotatorController):
         self._rotator = None
 
     def request_rotation(self, angle: Angle) -> None:
+        Guard.not_none(angle)
         if angle == 0:
             return
 
@@ -53,6 +55,7 @@ class RotatorController(IRotatorController):
         )
         
     def request_set_speed(self, percent: int) -> None:
+        Guard.not_none(percent)
         self._runner.run(
             lambda: self._ensure_open().set_speed(percent),
             key="rotator.set_speed",
