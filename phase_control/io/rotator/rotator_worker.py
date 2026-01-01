@@ -129,7 +129,23 @@ class RotatorController(IRotatorController):
             cancel_previous=True,
             drop_outdated=True,
         )
+        
+    def request_apply_config(self) -> None:
+        gen = self._mark_busy()
 
+        def work() -> None:
+            try:
+                self._ensure_open().apply_config()
+            finally:
+                self._clear_busy(gen)
+
+        self._runner.run(
+            work,
+            key="rotator.apply_config",
+            cancel_previous=True,
+            drop_outdated=True,
+        )
+        
     def request_set_speed(self, percent: int) -> None:
         gen = self._mark_busy()
 

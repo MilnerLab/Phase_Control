@@ -9,8 +9,8 @@ from base_core.math.models import Angle, AngleUnit
 from phase_control.io.rotator.interfaces import IRotatorController
 
 
-ROT_ANGLE = Angle(90, AngleUnit.DEG)             # fixed step angle
-POLL_S = 0.01                # busy polling interval
+ROT_ANGLE = Angle(90, AngleUnit.DEG)             
+POLL_S = 0.01                
 
 
 class RandomizationEngine(RunnableServiceBase):
@@ -19,16 +19,21 @@ class RandomizationEngine(RunnableServiceBase):
         self._rotator = rotator_worker
         self._cpu = cpu
         self._handle: Optional[StreamHandle] = None
-        self._rotation_speed: int = 30
+        self._rotation_speed: int = 70
 
         self._sign = +1
         self._stop_req = threading.Event()
         self._reset_after_stop = False
 
-    def set_rotation_speed(self, percent: int) -> None:
-            Guard.not_none(percent)
-            self._rotation_speed = percent
-            self.reset()
+    @property
+    def rotation_speed(self) -> int:
+        return self._rotation_speed
+
+    @rotation_speed.setter
+    def rotation_speed(self, value: int) -> None:
+        Guard.not_none(value)
+        self._rotation_speed = int(value)
+        self.reset()
             
     def start(self) -> None:
         self._stop_req.clear()
@@ -47,19 +52,17 @@ class RandomizationEngine(RunnableServiceBase):
         )
     
     def stop(self) -> None:
-        # graceful stop request: no new moves, but finish current one
         self._stop_req.set()
         super().stop()
         if self._handle:
-            self._handle.stop()  # does NOT "join"; it just requests stop
+            self._handle.stop()
+            self._handle = None 
 
     def reset(self) -> None:
-        # request reset AFTER the graceful stop completed
         self._reset_after_stop = True
         self.stop()
 
     def _producer(self, stop: threading.Event):
-        # normal loop: produce next angle only while not stopping
         while not stop.is_set() and not self._stop_req.is_set():
             while self._rotator.is_busy and not stop.is_set() and not self._stop_req.is_set():
                 time.sleep(POLL_S)
@@ -71,12 +74,10 @@ class RandomizationEngine(RunnableServiceBase):
             self._sign *= -1
             yield angle
 
-        # drain: if a move is currently running, wait until it finishes
         while self._rotator.is_busy:
             time.sleep(POLL_S)
 
     def _on_angle(self, angle: Angle) -> None:
-        # don't start new motion after stop was requested
         if self._stop_req.is_set():
             return
         self._rotator.request_rotation(angle)
@@ -89,10 +90,6 @@ class RandomizationEngine(RunnableServiceBase):
             self._sign = +1
             self._rotator.request_homing()
             self._rotator.request_set_speed(self._rotation_speed)
-
-        # Hinweis: dein RunnableServiceBase.reset() würde jetzt nichts machen,
-        # weil is_running False ist. Wenn du unbedingt auf NEW willst, musst du
-        # die Basisklasse anpassen (reset auch im STOPPED erlauben).
 
     def _on_error(self, e: BaseException) -> None:
         import traceback

@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 from PySide6.QtCore import Qt, Slot
 from PySide6.QtGui import QIntValidator
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QWidget
+from PySide6.QtWidgets import QHBoxLayout, QLabel, QLineEdit, QPushButton, QVBoxLayout, QWidget
 
 from base_qt.views.bases.view_base import ViewBase
 from phase_control.analysis_modules.randomize.ui.randomization_page_vm import RandomizationPageVM
@@ -19,15 +21,15 @@ class RandomizationPageView(ViewBase[RandomizationPageVM]):
         header_l.setContentsMargins(0, 0, 0, 0)
         header_l.setSpacing(8)
 
-        header_l.addWidget(QLabel("Movement speed (%)", header))
+        header_l.addWidget(QLabel("Override Movement Speed (%)", header))
 
         self._speed_edit = QLineEdit(header)
         self._speed_edit.setPlaceholderText("0–100")
         self._speed_edit.setFixedWidth(90)
         self._speed_edit.setAlignment(Qt.AlignRight)
         self._speed_edit.setValidator(QIntValidator(0, 100, self._speed_edit))
-        self._last_set_speed: int | None = None
-        
+        self._speed_edit.setText(str(int(self.vm.rotation_speed)))
+        self._last_set_speed = int(self.vm.rotation_speed)
 
         self._set_btn = QPushButton("Set", header)
         self._set_btn.setEnabled(False)
@@ -38,37 +40,32 @@ class RandomizationPageView(ViewBase[RandomizationPageVM]):
 
         root.addWidget(header, 0)
 
-        # --- plot area ------------------------------------------------------
+        # --- plot area (new instance per page view) -------------------------
         self._plot_view = SpectrumPlotView(self.vm.plot_vm)
         root.addWidget(self._plot_view, 1)
 
-
+        self._update_set_enabled()
 
     def bind(self) -> None:
         super().bind()
         self.connect_binding(self._set_btn.clicked, self._on_set_clicked)
         self.connect_binding(self._speed_edit.textChanged, self._on_speed_text_changed)
+        
 
     # ---------------- logic ----------------
-
     @Slot(str)
     def _on_speed_text_changed(self, _text: str) -> None:
         self._update_set_enabled()
-
+        
     @Slot()
     def _on_set_clicked(self) -> None:
         speed = self._parsed_speed()
         if speed is None:
             return
-        
-        self.vm.set_rotation_speed(speed)
+
+        self.vm.rotation_speed = speed
         self._last_set_speed = speed
         self._update_set_enabled()
-
-        # If the VM applies asynchronously, DON'T set _last_set_speed here.
-        # Wait for speed_applied_changed. If it's synchronous, you can do:
-        # self._last_set_speed = speed
-        # self._update_set_enabled()
 
     def _parsed_speed(self) -> int | None:
         text = self._speed_edit.text().strip()
@@ -84,5 +81,4 @@ class RandomizationPageView(ViewBase[RandomizationPageVM]):
 
     def _update_set_enabled(self) -> None:
         v = self._parsed_speed()
-        enabled = v is not None and (self._last_set_speed is None or v != self._last_set_speed)
-        self._set_btn.setEnabled(enabled)
+        self._set_btn.setEnabled(v is not None and (self._last_set_speed is None or v != self._last_set_speed))

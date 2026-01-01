@@ -1,6 +1,7 @@
 from base_core.framework.modules import BaseModule
 from phase_control.app.module import AppModule
 from phase_control.core.concurrency.runners import IIoTaskRunner
+from phase_control.io.rotator.config import ELL14Config
 from phase_control.io.rotator.interfaces import IRotatorController
 from phase_control.io.rotator.rotator_worker import RotatorController
 from phase_control.io.spectrometer.frame_buffer import FrameBuffer
@@ -13,6 +14,8 @@ class IOModule(BaseModule):
     requires = (AppModule,)
 
     def register(self, c, ctx) -> None:
+        c.register_singleton(ELL14Config, lambda c: ELL14Config())
+        
         c.register_singleton(IFrameBuffer, lambda c: FrameBuffer())
         c.register_singleton(SpectrometerStreamClient, lambda c: SpectrometerStreamClient())
         c.register_singleton(
