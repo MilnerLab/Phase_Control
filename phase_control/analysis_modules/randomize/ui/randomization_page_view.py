@@ -10,6 +10,10 @@ from phase_control.core.plotting.spectrum_plot_view import SpectrumPlotView
 
 
 class RandomizationPageView(ViewBase[RandomizationPageVM]):
+    @classmethod
+    def id(cls) -> str:
+        return "randomization.RandomizationPageView"
+    
     def build_ui(self) -> None:
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)

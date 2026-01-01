@@ -12,6 +12,9 @@ from base_qt.views.bases.view_base import ViewBase
 from phase_control.core.plotting.spectrum_plot_VM import SpectrumPlotVM
 
 class SpectrumPlotView(ViewBase[SpectrumPlotVM]):
+    @classmethod
+    def id(cls) -> str:
+        return "core.SpectrumPlotView"
     def build_ui(self) -> None:
         self._plot = pg.PlotWidget()
         self._plot.showGrid(x=True, y=True)

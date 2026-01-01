@@ -34,13 +34,13 @@ class AppModule(BaseModule):
         c.register_factory(MenuBarViewModel, lambda c: MenuBarViewModel())
         
         # If you want exactly one menubar instance, you can register it as singleton.
-        c.register_singleton(MenuBarView, lambda c: MenuBarView(c.get(MenuBarViewModel)))
+        c.register_singleton(MenuBarView, lambda c: MenuBarView(c.get(MenuBarViewModel), c.get(IViewRegistry)))
 
         # Register MENUBAR view spec (MainWindowViewBase will pick this up automatically)
         reg = c.get(IViewRegistry)
         reg.register(
             ViewSpec(
-                id="shell.menubar",
+                id=MenuBarView.id(),
                 title="MenuBar",
                 kind=ViewKind.MENUBAR,
                 factory=lambda: c.get(MenuBarView),

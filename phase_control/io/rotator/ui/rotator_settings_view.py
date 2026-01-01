@@ -20,6 +20,9 @@ def _feq(a: float, b: float, eps: float = 1e-9) -> bool:
 
 
 class RotatorSettingsView(ViewBase[RotatorSettingsViewModel]):
+    @classmethod
+    def id(cls) -> str:
+        return "io.RotatorSettingsView"
     def build_ui(self) -> None:
         root = QVBoxLayout(self)
         root.setContentsMargins(12, 12, 12, 12)

@@ -2,13 +2,15 @@ from __future__ import annotations
 from typing import Protocol, runtime_checkable
 
 from base_core.math.models import Angle
+from elliptec.config import ELL14Config
 
 
 @runtime_checkable
 class IRotatorController(Protocol):
     @property
     def is_busy(self) -> bool: ...
-    
+    @property
+    def config(self) -> ELL14Config: ...
     def open(self) -> None: ...
     def close(self) -> None: ...
     def request_rotation(self, angle: Angle) -> None: ...

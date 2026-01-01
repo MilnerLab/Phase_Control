@@ -9,6 +9,10 @@ from phase_control.core.plotting.spectrum_plot_view import SpectrumPlotView
 
 
 class StabilizationPageView(ViewBase[StabilizationPageVM]):
+    @classmethod
+    def id(cls) -> str:
+        return "stabilization.StabilizationPageView"
+    
     def build_ui(self) -> None:
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)

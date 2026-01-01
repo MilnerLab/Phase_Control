@@ -38,7 +38,7 @@ class StabilizationModule(BaseModule):
 
         view_reg = c.get(IViewRegistry)
         view_reg.register(ViewSpec(
-            id="stabilization",
+            id=StabilizationPageView.id(),
             title="Stabilization",
             kind=ViewKind.PAGE,
             factory=lambda: c.get(StabilizationPageView),

@@ -3,14 +3,16 @@ import threading
 from base_core.framework.concurrency.task_runner import ITaskRunner
 from base_core.math.models import Angle
 from elliptec.base.enums import StatusCode
+from elliptec.config import ELL14Config
 from elliptec.elliptec_ell14 import Rotator
 from phase_control.io.rotator.interfaces import IRotatorController
 
 
 class RotatorController(IRotatorController):
-    def __init__(self, port: str, io: ITaskRunner):
+    def __init__(self, port: str, io: ITaskRunner, config: ELL14Config):
         self._port = port
         self._runner = io
+        self._config = config
         self._rotator: Rotator | None = None
 
         self._busy = threading.Event()
@@ -21,6 +23,10 @@ class RotatorController(IRotatorController):
     def is_busy(self) -> bool:
         # IMPORTANT: no hardware / serial reads here
         return self._busy.is_set()
+    
+    @property
+    def config(self) -> ELL14Config:
+        return self._config
 
     def open(self) -> None:
         gen = self._mark_busy()
@@ -164,7 +170,7 @@ class RotatorController(IRotatorController):
 
     def _ensure_open(self) -> Rotator:
         if self._rotator is None:
-            r = Rotator()
+            r = Rotator(self._config)
             r.open(port=self._port)
             self._rotator = r
         return self._rotator

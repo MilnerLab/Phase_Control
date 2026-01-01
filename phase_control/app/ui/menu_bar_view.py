@@ -1,24 +1,17 @@
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QMenu
 from base_qt.views.bases.menu_view_base import MenuViewBase
+from base_qt.views.registry.interfaces import IViewRegistry
 from phase_control.app.ui.menu_bar_VM import MenuBarViewModel
 
 
 class MenuBarView(MenuViewBase[MenuBarViewModel]):
-    """
-    Extends the base menubar:
-    - keeps default File -> Exit from MenuViewBase
-    - adds File -> Settings
-    - adds Rotator -> Open settings, Restart
-    - adds Help -> About
-    """
-
-    def build_file_menu(self, menu: QMenu) -> None:
-        # Insert actions before the default Exit action
-        self._act_settings = QAction("Settings", self)
-        self._act_settings.setShortcut("Ctrl+,")
-        menu.addAction(self._act_settings)
-
+    @classmethod
+    def id(cls) -> str:
+        return "app.MenuBarView"
+    def __init__(self, vm: MenuBarViewModel, registry: IViewRegistry):
+        super().__init__(vm)
+        
     def build_ui(self) -> None:
         super().build_ui()
 

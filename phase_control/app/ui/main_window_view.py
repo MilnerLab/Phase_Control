@@ -21,6 +21,10 @@ from phase_control.app.ui.main_window_vm import MainWindowViewModel
 
 
 class MainWindowView(MainWindowViewBase[MainWindowViewModel]):
+    @classmethod
+    def id(cls) -> str:
+        return "app.MainWindowView"
+    
     def __init__(self, vm: MainWindowViewModel, registry: IViewRegistry):
         self._shown_page: Optional[ViewBase] = None
         super().__init__(vm, registry, title="Phase Control")

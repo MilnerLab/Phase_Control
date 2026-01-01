@@ -28,7 +28,7 @@ class RandomizationModule(BaseModule):
 
         view_reg = c.get(IViewRegistry)
         view_reg.register(ViewSpec(
-            id="randomizer",
+            id=RandomizationPageView.id(),
             title="Randomizer",
             kind=ViewKind.PAGE,
             factory=lambda: c.get(RandomizationPageView),

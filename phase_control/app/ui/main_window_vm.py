@@ -20,14 +20,13 @@ class MainWindowViewModel(QObject):
 
     def __init__(self, registry: IViewRegistry, event_bus: EventBus) -> None:
         super().__init__()
-        self._registry = registry
         self._bus = event_bus
 
         self._page_specs: List[ViewSpec] = []
         self._selected_id: Optional[str] = None
         self._current_page: Optional[ViewBase] = None
 
-        self._load_pages()
+        self._load_pages(registry)
         
     @property
     def current_page(self) -> Optional[ViewBase]:
@@ -55,9 +54,9 @@ class MainWindowViewModel(QObject):
             return
         self._get_vm().reset()
         
-    def _load_pages(self) -> None:
+    def _load_pages(self, registry: IViewRegistry) -> None:
         pages: List[ViewSpec] = []
-        for spec in self._registry.list():
+        for spec in registry.list():
             if spec.kind == ViewKind.PAGE:
                 pages.append(spec)
 
