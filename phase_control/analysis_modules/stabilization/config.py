@@ -159,5 +159,5 @@ class AnalysisConfig(FitParameter):
       - avg_spectra: number of spectra to average in PhaseTracker
     """
     wavelength_range: Range[Length] = Range(Length(796, Prefix.NANO), Length(810, Prefix.NANO))
-    residuals_threshold: float = 5.0
+    residuals_threshold: float = 15
     avg_spectra: int = 10

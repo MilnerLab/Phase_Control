@@ -13,6 +13,7 @@ from base_core.framework.events.event_bus import EventBus
 
 from base_core.math.functions import usCFG_projection
 from base_core.math.models import Angle
+from base_core.quantities.models import Length
 from phase_control.analysis_modules.stabilization.config import AnalysisConfig
 from phase_control.analysis_modules.stabilization.domain.phase_corrector import PhaseCorrector
 from phase_control.analysis_modules.stabilization.domain.phase_tracker import PhaseTracker
@@ -62,6 +63,13 @@ class AnalysisEngine(RunnableServiceBase):
     def set_on_result(self, cb: Optional[Callable[[dict[str, Spectrum]], None]]) -> None:
         with self._cb_lock:
             self._on_result = cb
+    @property
+    def target_phase(self):
+        return self._phase_corrector.target_phase
+    
+    @target_phase.setter
+    def target_phase(self, value: Angle):
+        self._phase_corrector.target_phase = value
 
     # -------------------------------------------------------------- #
     # Lifecycle
@@ -183,8 +191,6 @@ class AnalysisEngine(RunnableServiceBase):
 
         spectrum = spectrum.cut(self.config.wavelength_range)
 
-        x = np.asarray(spectrum.wavelengths_nm, dtype=float)
-
         self._phase_tracker.update(spectrum)
         current_phase: Optional[Angle] = self._phase_tracker.current_phase
 
@@ -202,7 +208,7 @@ class AnalysisEngine(RunnableServiceBase):
             )
 
             zero_kwargs = dict(fit_kwargs)
-            zero_kwargs["phase"] = 0.0
+            zero_kwargs["phase"] = self.target_phase
             y_zero_arr = np.asarray(
                 usCFG_projection(spectrum.wavelengths_nm, **zero_kwargs),
                 dtype=float,
@@ -215,8 +221,8 @@ class AnalysisEngine(RunnableServiceBase):
         
         out: dict[str, Spectrum] = {}
         if y_zero_arr is not None:
-            out["zero"] = Spectrum(x, y_zero_arr)
+            out["zero"] = Spectrum(spectrum.wavelengths, y_zero_arr)
         if y_fit_arr is not None:
-            out["fit"] = Spectrum(x, y_fit_arr)
+            out["fit"] = Spectrum(spectrum.wavelengths, y_fit_arr)
         
         return out
