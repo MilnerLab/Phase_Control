@@ -1,5 +1,8 @@
 
-class MenuBarViewModel:
+from PySide6.QtCore import QObject
+
+
+class MenuBarViewModel(QObject):
     """
     Minimal shell-level VM interface.
     Implement these methods in your real ShellVM.

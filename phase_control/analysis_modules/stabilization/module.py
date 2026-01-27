@@ -33,7 +33,7 @@ class StabilizationModule(BaseModule):
             cpu=c.get(ICpuTaskRunner),
             ))
         
-        c.register_factory(StabilizationPageVM, lambda c: StabilizationPageVM(c.get(AnalysisEngine), c.get(IUiDispatcher), ctx.event_bus, c.get(SpectrumPlotVM)))
+        c.register_factory(StabilizationPageVM, lambda c: StabilizationPageVM(c.get(AnalysisEngine), c.get(IUiDispatcher), ctx.event_bus, c.get(SpectrumPlotVM), c.get(AnalysisConfig)))
         c.register_factory(StabilizationPageView, lambda c: StabilizationPageView(c.get(StabilizationPageVM)))
 
         view_reg = c.get(IViewRegistry)

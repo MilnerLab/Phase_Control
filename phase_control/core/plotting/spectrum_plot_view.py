@@ -36,7 +36,7 @@ class SpectrumPlotView(ViewBase[SpectrumPlotVM]):
         self.connect_binding(self.vm.cleared, self._on_cleared)
 
 
-    @Slot(str, object)
+    @Slot(str, object, object)
     def _on_series_updated(self, key: str, x_obj: Object, y_obj: object) -> None:
         x = x_obj
         y = y_obj
