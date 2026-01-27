@@ -158,6 +158,6 @@ class AnalysisConfig(FitParameter):
       - residuals_threshold: max allowed residual for accepting a phase
       - avg_spectra: number of spectra to average in PhaseTracker
     """
-    wavelength_range: Range[Length] = Range(Length(800, Prefix.NANO), Length(805, Prefix.NANO))
+    wavelength_range: Range[Length] = Range(Length(796, Prefix.NANO), Length(810, Prefix.NANO))
     residuals_threshold: float = 5.0
     avg_spectra: int = 10

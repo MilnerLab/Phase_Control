@@ -64,7 +64,7 @@ class SpectrumPlotVM(ThreadSafeVMBase):
         spec = self._buffer.get_latest()
         if spec is None:
             return
-        cut = spec.cut(Range(Length(800, Prefix.NANO), Length(805, Prefix.NANO)))
+        cut = spec.cut(Range(Length(796, Prefix.NANO), Length(810, Prefix.NANO)))
         x = cut.wavelengths_nm.copy()
         y = cut.intensity.copy()
         self.apply_spectrum(x, y, "live")  

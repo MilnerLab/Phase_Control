@@ -49,7 +49,7 @@ class SpectrumPlotView(ViewBase[SpectrumPlotVM]):
             curve.setPen(pg.intColor(len(self._curve_order) - 1))
             curve.setData(x, y)
         else:
-            curve.setData(y)
+            curve.setData(x, y)
 
     @Slot(str)
     def _on_series_removed(self, key: str) -> None:
