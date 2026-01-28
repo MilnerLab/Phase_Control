@@ -15,6 +15,7 @@ from base_core.math.functions import usCFG_projection
 from base_core.math.models import Angle
 from base_core.quantities.models import Length
 from phase_control.analysis_modules.stabilization.config import AnalysisConfig
+from phase_control.analysis_modules.stabilization.domain.events import TOPIC_NEW_ANALYSIS_CONFIG
 from phase_control.analysis_modules.stabilization.domain.phase_corrector import PhaseCorrector
 from phase_control.analysis_modules.stabilization.domain.phase_tracker import PhaseTracker
 from phase_control.core.models import Spectrum
@@ -224,5 +225,6 @@ class AnalysisEngine(RunnableServiceBase):
             out["zero"] = Spectrum(spectrum.wavelengths, y_zero_arr)
         if y_fit_arr is not None:
             out["fit"] = Spectrum(spectrum.wavelengths, y_fit_arr)
+            self._bus.publish(TOPIC_NEW_ANALYSIS_CONFIG)
         
         return out

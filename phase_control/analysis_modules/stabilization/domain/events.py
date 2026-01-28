@@ -1,0 +1,1 @@
+TOPIC_NEW_ANALYSIS_CONFIG = "stabilization.new_config"
