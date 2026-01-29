@@ -27,6 +27,8 @@ class SpectrumPlotVM(ThreadSafeVMBase):
     series_updated = Signal(str, object, object) 
     series_removed = Signal(str)
     cleared = Signal()
+    
+    _normalize_spectrum = True
 
     def __init__(self, ui: IUiDispatcher, bus: EventBus, buffer: IFrameBuffer) -> None:
         super().__init__(ui, bus)
@@ -36,7 +38,15 @@ class SpectrumPlotVM(ThreadSafeVMBase):
         self._unsub: Optional[Callable[[], None]] = None
         
         self.sub_event(TOPIC_NEW_SPECTRUM, self._on_new_spectrum)
-
+    
+    @property
+    def normalize_spectrum(self) -> bool:
+        return self._normalize_spectrum
+    
+    @normalize_spectrum.setter
+    def normalize_spectrum(self, value: bool):
+        self._normalize_spectrum = value
+        
     @ui_thread
     def apply_spectrum(self, x: np.ndarray, y: np.ndarray, key: str) -> None:
         # runs in UI thread
@@ -61,7 +71,11 @@ class SpectrumPlotVM(ThreadSafeVMBase):
             self._unsub = None
             
     def _on_new_spectrum(self, args) -> None:
-        spec = self._buffer.get_latest()
+        if self._normalize_spectrum == True:
+            spec = self._buffer.get_latest().normalize()
+        else:
+            spec = self._buffer.get_latest()
+            
         if spec is None:
             return
         cut = spec.cut(Range(Length(796, Prefix.NANO), Length(810, Prefix.NANO)))

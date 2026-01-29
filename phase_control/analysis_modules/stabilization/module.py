@@ -21,7 +21,7 @@ from base_qt.app.interfaces import IUiDispatcher
 
 
 class StabilizationModule(BaseModule):
-    name = "spectrometer"
+    name = "stabilization"
     requires = (AppModule, CoreModule,)  
 
     def register(self, c, ctx) -> None:
