@@ -7,6 +7,7 @@ from base_qt.view_models.runnable_vm import IUiDispatcher, RunnableVMBase
 from phase_control.analysis_modules.envelope.config import EnvelopeSignalGeneratorConfig
 from phase_control.analysis_modules.envelope.domain.enums import EnvelopeMode
 from phase_control.analysis_modules.envelope.engine import EnvelopeEngine
+from phase_control.core.models import Spectrum
 from phase_control.core.plotting.spectrum_plot_VM import SpectrumPlotVM
 
 class EnvelopePageVM(RunnableVMBase):
@@ -36,3 +37,19 @@ class EnvelopePageVM(RunnableVMBase):
             return
         self._config.mode = m
         self.mode_changed.emit(self._config.mode)
+        
+    def start(self):
+        self._engine.set_on_result(self._on_new_result)
+        super().start()
+    
+    def stop(self):
+        super().stop()
+        self._engine.set_on_result(None)
+    
+    def _on_new_result(self, spectra: dict[str, Spectrum]) -> None:
+        for key, spec in spectra.items():
+
+            x = spec.wavelengths_nm.copy()
+            y = spec.intensity.copy()
+
+            self.plot_vm.apply_spectrum(x, y, key)
