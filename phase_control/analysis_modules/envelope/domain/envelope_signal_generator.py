@@ -22,6 +22,8 @@ class EnvelopeSignalGenerator:
 
     def __init__(self, config: EnvelopeSignalGeneratorConfig) -> None:
         self.config = config
+        self._last_metric = 0.0
+        self._direction = 1
 
     def update(self, spectrum: Spectrum) -> tuple[Optional[Angle], dict[str, Spectrum]]:
         """
@@ -37,7 +39,7 @@ class EnvelopeSignalGenerator:
         spec = spectrum.cut(self.config.wavelength_range)
 
         # 2) smooth (moving average along wavelength)
-        y = np.asarray(spec.intensities, dtype=float)
+        y = np.asarray(spec.intensity, dtype=float)
         if y.size == 0 or not np.all(np.isfinite(y)):
             return None, {}
 
@@ -55,7 +57,7 @@ class EnvelopeSignalGenerator:
         self._last_metric = metric
 
         # 5) output correction angle (fixed step)
-        correction = self.config.step_angle if self._direction > 0 else Angle(-self.config.step_angle)
+        correction = Angle(self._direction * self.config.step_angle)
 
         # debug output for plotting
         out: dict[str, Spectrum] = {
@@ -72,6 +74,6 @@ class EnvelopeSignalGenerator:
 
     def _is_improved(self, current: float) -> bool:
         if self.config.mode == EnvelopeMode.MAXIMIZE:
-            return current > self._last_metric, + self.config.improve_eps
+            return current > self._last_metric
         else:
-            return current < self._last_metric, - self.config.improve_eps
+            return current < self._last_metric

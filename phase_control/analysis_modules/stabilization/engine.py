@@ -111,7 +111,8 @@ class AnalysisEngine(RunnableServiceBase):
     # -------------------------------------------------------------- #
     def _on_new_spectrum(self, _args) -> None:
         # Keep it short. We only latch latest spectrum.
-        spec = self._buffer.get_latest().normalize()
+        spec = self._buffer.get_latest()
+        spec.normalize()
         if spec is None:
             return
         with self._pending_lock:

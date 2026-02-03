@@ -72,7 +72,8 @@ class SpectrumPlotVM(ThreadSafeVMBase):
             
     def _on_new_spectrum(self, args) -> None:
         if self._normalize_spectrum == True:
-            spec = self._buffer.get_latest().normalize()
+            spec = self._buffer.get_latest()
+            spec.normalize()
         else:
             spec = self._buffer.get_latest()
             
