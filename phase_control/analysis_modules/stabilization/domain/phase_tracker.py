@@ -62,6 +62,7 @@ class PhaseTracker:
                     print("Residuals: ", new_config.residual)
                     self.current_phase = new_config.phase
                     self._config.phase = new_config.phase
+                    self._config.residual = new_config.residual
 
     # ------------------------------------------------------------------ #
     # Internals: fitting

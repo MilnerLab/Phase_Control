@@ -27,5 +27,5 @@ class AnalysisConfigVM(ThreadSafeVMBase):
         self.is_running_changed.emit(v)
 
     @ui_thread
-    def notify_config_changed(self) -> None:
+    def notify_config_changed(self, payload) -> None:
         self.config_changed.emit()
