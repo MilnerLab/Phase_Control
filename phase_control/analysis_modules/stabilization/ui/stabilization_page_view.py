@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Protocol, List
-
 from PySide6.QtCore import Slot, Qt
 from PySide6.QtWidgets import (
     QLabel,
@@ -10,12 +8,10 @@ from PySide6.QtWidgets import (
     QDoubleSpinBox,
     QPushButton,
     QDialog,
-    QWidget,
 )
 
 from base_qt.views.bases.view_base import ViewBase
 from base_qt.views.registry.interfaces import IViewRegistry
-from phase_control.analysis_modules.stabilization.ui.analysis_config_view import AnalysisConfigView
 from phase_control.analysis_modules.stabilization.ui.stabiliation_page_VM import StabilizationPageVM
 from phase_control.core.plotting.spectrum_plot_view import SpectrumPlotView
 

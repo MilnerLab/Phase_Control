@@ -26,23 +26,25 @@ class Spectrum:
         cls,
         wavelengths: Sequence[float],
         counts: Sequence[int | float],
-        normalize: bool = True,
     ) -> Spectrum:
         arr = np.asarray(counts, dtype=float)
-
-        if normalize and arr.size > 0:
-            arr = arr - np.amin(arr)
-            max_val = np.amax(arr)
-            if max_val > 0:
-                arr = arr / max_val
-
         wl_lengths = [Length(w, Prefix.NANO) for w in wavelengths]
 
         return cls(
             wavelengths=wl_lengths,
             intensity=arr.tolist(),
         )
-
+        
+    def normalize(self) -> None:
+        arr = np.asarray(self.intensity, dtype=float)
+        arr = arr - np.amin(arr)
+        max_val = np.amax(arr)
+        
+        if max_val > 0:
+            arr = arr / max_val
+            
+        self.intensity = arr.tolist()
+        
     def cut(self, range_wl: Range) -> Spectrum:
         wavelengths_cut: list[Length] = []
         intensity_cut: list[float] = []
