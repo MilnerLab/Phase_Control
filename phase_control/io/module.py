@@ -1,3 +1,5 @@
+from cProfile import label
+from base_core.framework.json.json_endpoint import JsonlSubprocessEndpoint
 from base_core.framework.modules import BaseModule
 from base_qt.views.registry.enums import ViewKind
 from base_qt.views.registry.interfaces import IViewRegistry
@@ -9,9 +11,11 @@ from phase_control.io.rotator.rotator_worker import RotatorController
 from phase_control.io.rotator.ui.rotator_settings_view import RotatorSettingsView
 from phase_control.io.rotator.ui.rotator_settings_vm import ELL14Config, RotatorSettingsViewModel
 from phase_control.io.spectrometer.frame_buffer import FrameBuffer
-from phase_control.io.spectrometer.acquisition_service import SpectrometerAcquisitionService
 from phase_control.io.spectrometer.interfaces import IFrameBuffer
-from phase_control.io.spectrometer.stream_client import SpectrometerStreamClient
+from phase_control.io.spectrometer.spectrometer_service import SpectrometerService
+from phase_control.io.spectrometer.ui.spectrometer_settings_view import SpectrometerSettingsView
+from phase_control.io.spectrometer.ui.spectrometer_settings_vm import SpectrometerSettingsViewModel
+from spm_002.config import PYTHON32_PATH, SpectrometerConfig
 
 
 class IOModule(BaseModule):
@@ -20,16 +24,19 @@ class IOModule(BaseModule):
     def register(self, c, ctx) -> None:
         
         c.register_singleton(IFrameBuffer, lambda c: FrameBuffer())
-        c.register_singleton(SpectrometerStreamClient, lambda c: SpectrometerStreamClient())
-        c.register_singleton(
-            SpectrometerAcquisitionService,
-            lambda c: SpectrometerAcquisitionService(
+        c.register_singleton(SpectrometerConfig, lambda c: SpectrometerConfig())
+        
+        c.register_singleton(JsonlSubprocessEndpoint, lambda c: JsonlSubprocessEndpoint(argv=[PYTHON32_PATH, "-u", "-m", "spm_002.spectrometer_server"],))
+        c.register_singleton(SpectrometerService, lambda c: SpectrometerService(
                 io=c.get(IIoTaskRunner),
+                endpoint=c.get(JsonlSubprocessEndpoint),
                 bus=ctx.event_bus,                 
                 buffer=c.get(IFrameBuffer),
-                client=c.get(SpectrometerStreamClient),
-            ),
-        )
+                config=c.get(SpectrometerConfig)))
+        
+        c.register_factory(RotatorSettingsViewModel, lambda c: RotatorSettingsViewModel(c.get(IRotatorController)))
+        c.register_factory(RotatorSettingsView, lambda c: RotatorSettingsView(RotatorSettingsViewModel))
+        
         c.register_singleton(ELL14Config, lambda c: ELL14Config())
         c.register_singleton(
             IRotatorController,
@@ -38,8 +45,8 @@ class IOModule(BaseModule):
                 io=c.get(IIoTaskRunner),
                 config=c.get(ELL14Config)))
         
-        c.register_factory(RotatorSettingsViewModel, lambda c: RotatorSettingsViewModel(c.get(IRotatorController)))
-        c.register_factory(RotatorSettingsView, lambda c: RotatorSettingsView(RotatorSettingsViewModel))
+        c.register_factory(SpectrometerSettingsViewModel, lambda c: SpectrometerSettingsViewModel(c.get(SpectrometerService)))
+        c.register_factory(SpectrometerSettingsView, lambda c: SpectrometerSettingsView(SpectrometerSettingsViewModel))
         
         reg = c.get(IViewRegistry)
         reg.register(
@@ -49,13 +56,21 @@ class IOModule(BaseModule):
                 kind=ViewKind.POPOUT,
                 factory=lambda: c.get(RotatorSettingsView),
                 order=0,
+            ))
+        reg.register(
+            ViewSpec(
+                id=SpectrometerSettingsView.id(),
+                title="Rotator Settings",
+                kind=ViewKind.POPOUT,
+                factory=lambda: c.get(SpectrometerSettingsView),
+                order=0,
             )
         )
 
     def on_startup(self, c, ctx) -> None:
-        c.get(SpectrometerAcquisitionService).start()
+        c.get(SpectrometerService).start()
         c.get(IRotatorController).open()
 
     def on_shutdown(self, c, ctx) -> None:
         c.get(IRotatorController).close()
-        c.get(SpectrometerAcquisitionService).stop()
+        c.get(SpectrometerService).stop()

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from PySide6.QtCore import Signal, Slot
 
 from base_qt.view_models.vm_base import VMBase
