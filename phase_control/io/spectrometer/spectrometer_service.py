@@ -28,6 +28,7 @@ class SpectrometerService(DeviceService):
 
         self.register_handler(MsgType.META, self._on_meta)
         self.register_handler(MsgType.FRAME, self._on_frame)
+        
 
     @property
     def config(self) -> SpectrometerConfig:

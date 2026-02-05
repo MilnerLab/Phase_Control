@@ -23,7 +23,7 @@ from phase_control.analysis_modules.randomize.module import RandomizationModule
 from phase_control.analysis_modules.stabilization.module import StabilizationModule
 from phase_control.app.module import AppModule
 from phase_control.app.ui.main_window_view import MainWindowView
-from phase_control.core.concurrency.runners import ICpuTaskRunner, IIoTaskRunner
+from phase_control.core.concurrency.runners import ICpuTaskRunner, IRotatorTaskRunner, ISpectrometerTaskRunner
 from phase_control.core.module import CoreModule
 from phase_control.io.module import IOModule
 from base_qt.app.interfaces import IUiDispatcher
@@ -54,15 +54,18 @@ def build_container(ctx: AppContext) -> Container:
 
     c.register_instance(AppContext, ctx)
 
-    io_exec = ThreadPoolExecutor(max_workers=2, thread_name_prefix="io")
+    io_spectrometer_exec = ThreadPoolExecutor(max_workers=2, thread_name_prefix="io.spectrometer")
+    io_rotator_exec = ThreadPoolExecutor(max_workers=1, thread_name_prefix="io.spectrometer")
     cpu_exec = ThreadPoolExecutor(max_workers=1, thread_name_prefix="cpu") 
 
-    c.register_singleton(IIoTaskRunner, lambda c: TaskRunner(io_exec))
+    c.register_singleton(ISpectrometerTaskRunner, lambda c: TaskRunner(io_spectrometer_exec))
+    c.register_singleton(IRotatorTaskRunner, lambda c: TaskRunner(io_rotator_exec))
     c.register_singleton(ICpuTaskRunner, lambda c: TaskRunner(cpu_exec))
     
     c.register_singleton(IUiDispatcher, lambda c: QtDispatcher())
 
-    ctx.lifecycle.add(lambda: io_exec.shutdown(wait=False))
+    ctx.lifecycle.add(lambda: io_spectrometer_exec.shutdown(wait=False))
+    ctx.lifecycle.add(lambda: io_rotator_exec.shutdown(wait=False))
     ctx.lifecycle.add(lambda: cpu_exec.shutdown(wait=False))
 
     return c

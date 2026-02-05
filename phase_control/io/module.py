@@ -5,7 +5,7 @@ from base_qt.views.registry.enums import ViewKind
 from base_qt.views.registry.interfaces import IViewRegistry
 from base_qt.views.registry.models import ViewSpec
 from phase_control.app.module import AppModule
-from phase_control.core.concurrency.runners import IIoTaskRunner
+from phase_control.core.concurrency.runners import IRotatorTaskRunner, ISpectrometerTaskRunner
 from phase_control.io.rotator.interfaces import IRotatorController
 from phase_control.io.rotator.rotator_worker import RotatorController
 from phase_control.io.rotator.ui.rotator_settings_view import RotatorSettingsView
@@ -27,7 +27,7 @@ class IOModule(BaseModule):
         
         c.register_singleton(JsonlSubprocessEndpoint, lambda c: JsonlSubprocessEndpoint(argv=[PYTHON32_PATH, "-u", "-m", "spm_002.spectrometer_server"],))
         c.register_singleton(SpectrometerService, lambda c: SpectrometerService(
-                io=c.get(IIoTaskRunner),
+                io=c.get(ISpectrometerTaskRunner),
                 endpoint=c.get(JsonlSubprocessEndpoint),
                 bus=ctx.event_bus,                 
                 buffer=c.get(IFrameBuffer)))
@@ -40,7 +40,7 @@ class IOModule(BaseModule):
             IRotatorController,
             lambda c: RotatorController(
                 port="COM6",
-                io=c.get(IIoTaskRunner),
+                io=c.get(IRotatorTaskRunner),
                 config=c.get(ELL14Config)))
         
         c.register_factory(SpectrometerSettingsViewModel, lambda c: SpectrometerSettingsViewModel(c.get(SpectrometerService)))
@@ -66,7 +66,9 @@ class IOModule(BaseModule):
         )
 
     def on_startup(self, c, ctx) -> None:
-        c.get(SpectrometerService).start()
+        spectrometer: SpectrometerService = c.get(SpectrometerService)
+        spectrometer.start()
+        spectrometer.set_config_async()
         c.get(IRotatorController).open()
 
     def on_shutdown(self, c, ctx) -> None:
