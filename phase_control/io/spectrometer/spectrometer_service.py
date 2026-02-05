@@ -20,12 +20,11 @@ class SpectrometerService(DeviceService):
         endpoint: JsonlSubprocessEndpoint,
         bus: EventBus,
         buffer: FrameBuffer,
-        config: SpectrometerConfig,
     ) -> None:
         super().__init__(io, endpoint)
         self._bus = bus
         self._buffer = buffer
-        self._config = config
+        self._config = SpectrometerConfig()
 
         self.register_handler(MsgType.META, self._on_meta)
         self.register_handler(MsgType.FRAME, self._on_frame)

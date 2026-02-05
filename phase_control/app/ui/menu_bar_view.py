@@ -59,7 +59,7 @@ class MenuBarView(MenuViewBase[MenuBarViewModel]):
 
         layout = QVBoxLayout(dlg)
         layout.setContentsMargins(8, 8, 8, 8)
-        layout.addWidget(view)
+        layout.addWidget(view.factory())
 
         dlg.resize(420, 320)
         dlg.show()

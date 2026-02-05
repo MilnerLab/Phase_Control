@@ -24,15 +24,13 @@ class IOModule(BaseModule):
     def register(self, c, ctx) -> None:
         
         c.register_singleton(IFrameBuffer, lambda c: FrameBuffer())
-        c.register_singleton(SpectrometerConfig, lambda c: SpectrometerConfig())
         
         c.register_singleton(JsonlSubprocessEndpoint, lambda c: JsonlSubprocessEndpoint(argv=[PYTHON32_PATH, "-u", "-m", "spm_002.spectrometer_server"],))
         c.register_singleton(SpectrometerService, lambda c: SpectrometerService(
                 io=c.get(IIoTaskRunner),
                 endpoint=c.get(JsonlSubprocessEndpoint),
                 bus=ctx.event_bus,                 
-                buffer=c.get(IFrameBuffer),
-                config=c.get(SpectrometerConfig)))
+                buffer=c.get(IFrameBuffer)))
         
         c.register_factory(RotatorSettingsViewModel, lambda c: RotatorSettingsViewModel(c.get(IRotatorController)))
         c.register_factory(RotatorSettingsView, lambda c: RotatorSettingsView(RotatorSettingsViewModel))
@@ -46,7 +44,7 @@ class IOModule(BaseModule):
                 config=c.get(ELL14Config)))
         
         c.register_factory(SpectrometerSettingsViewModel, lambda c: SpectrometerSettingsViewModel(c.get(SpectrometerService)))
-        c.register_factory(SpectrometerSettingsView, lambda c: SpectrometerSettingsView(SpectrometerSettingsViewModel))
+        c.register_factory(SpectrometerSettingsView, lambda c: SpectrometerSettingsView(c.get(SpectrometerSettingsViewModel)))
         
         reg = c.get(IViewRegistry)
         reg.register(
