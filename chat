@@ -1,0 +1,43 @@
+Error calling Python override of QGraphicsView::mouseMoveEvent(): Traceback (most recent call last):
+  File "C:\milnerlab_github\Phase_Control\.venv\Lib\site-packages\pyqtgraph\widgets\GraphicsView.py", line 354, in mouseMoveEvent
+    lpos = ev.position() if hasattr(ev, 'position') else ev.localPos()
+           ~~~~~~~~~~~^^
+  File "C:\milnerlab_github\Base_Qt\base_qt\view_models\thread_safe_vm_base.py", line 19, in <lambda>
+    self.post_ui(lambda: method(*args, **kwargs))
+                         ~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\milnerlab_github\Phase_Control\phase_control\core\plotting\spectrum_plot_VM.py", line 53, in apply_spectrum
+    x = np.asarray(x, dtype=float)
+  File "C:\milnerlab_github\Base_Qt\base_qt\view_models\thread_safe_vm_base.py", line 19, in <lambda>
+    self.post_ui(lambda: method(*args, **kwargs))
+                         ~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\milnerlab_github\Phase_Control\phase_control\core\plotting\spectrum_plot_VM.py", line 53, in apply_spectrum
+    x = np.asarray(x, dtype=float)
+  File "C:\milnerlab_github\Base_Qt\base_qt\view_models\thread_safe_vm_base.py", line 19, in <lambda>
+    self.post_ui(lambda: method(*args, **kwargs))
+                         ~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\milnerlab_github\Phase_Control\phase_control\core\plotting\spectrum_plot_VM.py", line 53, in apply_spectrum
+    x = np.asarray(x, dtype=float)
+  File "C:\milnerlab_github\Base_Qt\base_qt\view_models\thread_safe_vm_base.py", line 19, in <lambda>
+    self.post_ui(lambda: method(*args, **kwargs))
+                         ~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\milnerlab_github\Phase_Control\phase_control\core\plotting\spectrum_plot_VM.py", line 53, in apply_spectrum
+    x = np.asarray(x, dtype=float)
+  File "C:\milnerlab_github\Base_Qt\base_qt\view_models\thread_safe_vm_base.py", line 19, in <lambda>
+    self.post_ui(lambda: method(*args, **kwargs))
+                         ~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\milnerlab_github\Phase_Control\phase_control\core\plotting\spectrum_plot_VM.py", line 53, in apply_spectrum
+    x = np.asarray(x, dtype=float)
+  File "C:\milnerlab_github\Base_Qt\base_qt\view_models\thread_safe_vm_base.py", line 19, in <lambda>
+    self.post_ui(lambda: method(*args, **kwargs))
+                         ~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\milnerlab_github\Phase_Control\phase_control\core\plotting\spectrum_plot_VM.py", line 53, in apply_spectrum
+    x = np.asarray(x, dtype=float)
+  File "C:\milnerlab_github\Base_Qt\base_qt\view_models\thread_safe_vm_base.py", line 19, in <lambda>
+    self.post_ui(lambda: method(*args, **kwargs))
+                         ~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\milnerlab_github\Phase_Control\phase_control\core\plotting\spectrum_plot_VM.py", line 53, in apply_spectrum
+    x = np.asarray(x, dtype=float)
+  File "C:\milnerlab_github\Base_Qt\base_qt\view_models\thread_safe_vm_base.py", line 19, in <lambda>
+    self.post_ui(lambda: method(*args, **kwargs))
+                         ~~~~~~^^^^^^^^^^^^^^^^^
+TypeError: AnalysisConfigVM.notify_config_changed() missing 1 required positional argument: 'payload'

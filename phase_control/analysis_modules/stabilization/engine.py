@@ -226,6 +226,6 @@ class AnalysisEngine(RunnableServiceBase):
             out["zero"] = Spectrum(spectrum.wavelengths, y_zero_arr)
         if y_fit_arr is not None:
             out["fit"] = Spectrum(spectrum.wavelengths, y_fit_arr)
-            self._bus.publish(TOPIC_NEW_ANALYSIS_CONFIG, None)
+            self._bus.publish(TOPIC_NEW_ANALYSIS_CONFIG, "")
         
         return out
