@@ -70,18 +70,31 @@ class PhaseTracker:
 
     def _initialize_fit_parameters(self, spectrum: Spectrum) -> FitParameter1:
         """
-        Perform a full fit of all parameters on the given spectrum to obtain
-        good starting values.
+        Fit parameters on the given spectrum to obtain good starting values,
+        but keep a_R fixed (not fitted).
         """
         first_arg_name = self._get_first_arg_name()
         model = lmfit.Model(cfg_projection_nu_equal_amplitudes_safe, independent_vars=[first_arg_name])
 
         fit_kwargs: dict[str, Any] = self._config.to_fit_kwargs(cfg_projection_nu_equal_amplitudes_safe)
+
+        # Build lmfit Parameters object so we can freeze a_R_THz_per_ps
+        params = model.make_params(**fit_kwargs)
+
+        # Freeze a_R_THz_per_ps
+        params["a_R_THz_per_ps"].set(vary=False)
+
+        # (optional) also freeze envelope params if you don't want to fit them:
+        # params["carrier_wavelength"].set(vary=False)
+        # params["bandwidth"].set(vary=False)
+
+        # Independent variable
         fit_kwargs[first_arg_name] = spectrum.wavelengths_nm
 
         result = model.fit(
             spectrum.intensity,
-            **fit_kwargs,
+            params=params,                 # <-- crucial
+            **{first_arg_name: spectrum.wavelengths_nm},
             max_nfev=int(1_000_000),
         )
         return FitParameter1.from_fit_result(self._config, result)
