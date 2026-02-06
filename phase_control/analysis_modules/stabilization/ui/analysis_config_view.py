@@ -3,6 +3,7 @@ from site import PREFIXES
 
 from PySide6.QtCore import Slot
 from PySide6.QtWidgets import (
+    QAbstractButton,
     QAbstractSpinBox,
     QDialog,
     QDoubleSpinBox,
@@ -19,7 +20,7 @@ from base_core.quantities.enums import Prefix
 from base_core.quantities.models import Length
 from base_core.math.models import Angle, Range
 from phase_control.analysis_modules.stabilization.ui.analysis_config_vm import AnalysisConfigVM
-
+from base_qt.ui.toggle_switch import ToggleSwitch
 
 
 class AnalysisConfigView(ViewBase[AnalysisConfigVM]):
@@ -38,8 +39,7 @@ class AnalysisConfigView(ViewBase[AnalysisConfigVM]):
         self._wl_max = QDoubleSpinBox(); self._wl_max.setButtonSymbols(QAbstractSpinBox.NoButtons)
         self._res_thresh = QDoubleSpinBox(); self._res_thresh.setButtonSymbols(QAbstractSpinBox.NoButtons)
         self._avg = QSpinBox(); self._avg.setButtonSymbols(QAbstractSpinBox.NoButtons)
-        self._has_accel = QPushButton("Has Acceleration")
-        self._has_accel.setCheckable(True)
+        self._has_accel = ToggleSwitch(text_on="ON", text_off="OFF")
 
         for sb in (self._wl_min, self._wl_max):
             sb.setDecimals(3); sb.setRange(-1e6, 1e6); sb.setSingleStep(0.1)
@@ -138,10 +138,13 @@ class AnalysisConfigView(ViewBase[AnalysisConfigVM]):
     def write_to_ui(self) -> None:
         cfg = self.vm.config
 
-        def setv(sb, v):
-            sb.blockSignals(True)
-            sb.setValue(v)
-            sb.blockSignals(False)
+        def setv(w, v):
+            w.blockSignals(True)
+            if isinstance(w, QAbstractButton):
+                w.setChecked(bool(v))
+            else:
+                w.setValue(v)
+            w.blockSignals(False)
 
         # Range: passe ggf. an deine Range Felder an
         setv(self._wl_min, cfg.wavelength_range.min.value(Prefix.NANO))

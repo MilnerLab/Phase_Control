@@ -16,6 +16,8 @@ from phase_control.io.spectrometer.spectrometer_service import SpectrometerServi
 from phase_control.io.spectrometer.ui.spectrometer_settings_view import SpectrometerSettingsView
 from phase_control.io.spectrometer.ui.spectrometer_settings_vm import SpectrometerSettingsViewModel
 from spm_002.config import PYTHON32_PATH, SpectrometerConfig
+from base_core.framework.app.enums import AppStatus
+
 
 
 class IOModule(BaseModule):
@@ -66,6 +68,8 @@ class IOModule(BaseModule):
         )
 
     def on_startup(self, c, ctx) -> None:
+        if ctx.status is AppStatus.OFFLINE:
+            return
         spectrometer: SpectrometerService = c.get(SpectrometerService)
         spectrometer.start()
         spectrometer.set_config_async()

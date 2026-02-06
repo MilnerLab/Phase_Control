@@ -27,6 +27,8 @@ from phase_control.core.concurrency.runners import ICpuTaskRunner, IRotatorTaskR
 from phase_control.core.module import CoreModule
 from phase_control.io.module import IOModule
 from base_qt.app.interfaces import IUiDispatcher
+from base_core.framework.app.enums import AppStatus
+
 
 
 
@@ -39,8 +41,10 @@ def build_context() -> AppContext:
     ctx = AppContext(
         config={
             "app_name": "Your App",
+            "app_status:": "offline",
             "rotator_port": "COM6",
         },
+        status=AppStatus.OFFLINE,
         log=log,
         event_bus=bus,
         lifecycle=lifecycle,
