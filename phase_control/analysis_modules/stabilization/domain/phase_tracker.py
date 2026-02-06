@@ -83,6 +83,10 @@ class PhaseTracker:
 
         # Freeze a_R_THz_per_ps
         params["a_R_THz_per_ps"].set(vary=False)
+        
+        if not self._config.has_acceleration:
+            self._config.a_L_THz_per_ps = self._config.a_R_THz_per_ps
+            params["a_R_THz_per_ps"].set(vary=False)
 
         # (optional) also freeze envelope params if you don't want to fit them:
         # params["carrier_wavelength"].set(vary=False)

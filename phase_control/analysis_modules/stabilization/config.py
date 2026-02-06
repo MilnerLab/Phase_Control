@@ -266,7 +266,7 @@ class FitParameter1:
         Some AnalysisConfig-specific fields are deliberately NOT copied.
         """
         for f in fields(self):
-            if f.name not in ("wavelength_range", "avg_spectra", "residuals_threshold"):
+            if f.name not in ("wavelength_range", "avg_spectra", "residuals_threshold", "has_acceleration"):
                 setattr(self, f.name, getattr(other, f.name))
 
     # ---- conversion helpers ---- #
@@ -306,3 +306,5 @@ class AnalysisConfig(FitParameter1):
     wavelength_range: Range[Length] = Range(Length(796, Prefix.NANO), Length(810, Prefix.NANO))
     residuals_threshold: float = 15
     avg_spectra: int = 10
+    has_acceleration: bool = True
+    

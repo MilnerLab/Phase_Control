@@ -38,6 +38,8 @@ class AnalysisConfigView(ViewBase[AnalysisConfigVM]):
         self._wl_max = QDoubleSpinBox(); self._wl_max.setButtonSymbols(QAbstractSpinBox.NoButtons)
         self._res_thresh = QDoubleSpinBox(); self._res_thresh.setButtonSymbols(QAbstractSpinBox.NoButtons)
         self._avg = QSpinBox(); self._avg.setButtonSymbols(QAbstractSpinBox.NoButtons)
+        self._has_accel = QPushButton("Has Acceleration")
+        self._has_accel.setCheckable(True)
 
         for sb in (self._wl_min, self._wl_max):
             sb.setDecimals(3); sb.setRange(-1e6, 1e6); sb.setSingleStep(0.1)
@@ -48,6 +50,7 @@ class AnalysisConfigView(ViewBase[AnalysisConfigVM]):
         f1.addRow("Wavelength max [nm]", self._wl_max)
         f1.addRow("Residual threshold", self._res_thresh)
         f1.addRow("Avg spectra", self._avg)
+        f1.addRow("Has Acceleration", self._has_accel)
         root.addWidget(g1)
 
         # --- FitParameter ---
@@ -116,6 +119,7 @@ class AnalysisConfigView(ViewBase[AnalysisConfigVM]):
         cfg.wavelength_range = Range(Length(self._wl_min.value(), Prefix.NANO), Length(self._wl_max.value(), Prefix.NANO))
         cfg.residuals_threshold = float(self._res_thresh.value())
         cfg.avg_spectra = int(self._avg.value())
+        cfg.has_acceleration = bool(self._has_accel.isChecked())
 
         # ---- fit params only if not running ----
         if not self.vm.is_running():
@@ -140,12 +144,11 @@ class AnalysisConfigView(ViewBase[AnalysisConfigVM]):
             sb.blockSignals(False)
 
         # Range: passe ggf. an deine Range Felder an
-        lo = cfg.wavelength_range.min  # oder .lower
-        hi = cfg.wavelength_range.max  # oder .upper
         setv(self._wl_min, cfg.wavelength_range.min.value(Prefix.NANO))
         setv(self._wl_max, cfg.wavelength_range.max.value(Prefix.NANO))
         setv(self._res_thresh, float(cfg.residuals_threshold))
         setv(self._avg, int(cfg.avg_spectra))
+        setv(self._has_accel, bool(cfg.has_acceleration))
 
         setv(self._carrier, cfg.central_wavelength.value(Prefix.NANO))
         setv(self._bw, cfg.bandwidth.value(Prefix.NANO))
