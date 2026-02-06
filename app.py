@@ -44,7 +44,7 @@ def build_context() -> AppContext:
             "app_status:": "offline",
             "rotator_port": "COM6",
         },
-        status=AppStatus.OFFLINE,
+        status=AppStatus.CONNECTED,
         log=log,
         event_bus=bus,
         lifecycle=lifecycle,

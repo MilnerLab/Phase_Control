@@ -41,7 +41,7 @@ class IOModule(BaseModule):
         c.register_singleton(
             IRotatorController,
             lambda c: RotatorController(
-                port="COM6",
+                port="COM3",
                 io=c.get(IRotatorTaskRunner),
                 config=c.get(ELL14Config)))
         

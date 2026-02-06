@@ -165,15 +165,15 @@ class FitParameter1:
       - phase: Angle (radians)
     """
 
-    central_wavelength: Length = Length(802.38, Prefix.NANO)
-    bandwidth: Length = Length(7.4728, Prefix.NANO)  # interpreted by your fit function (sigma or FWHM)
+    central_wavelength: Length = Length(794, Prefix.NANO)
+    bandwidth: Length = Length(12, Prefix.NANO)  # interpreted by your fit function (sigma or FWHM)
     baseline: float = 0.3338
     phase: Angle = Angle(-3.34)
 
     # --- NEW parameters for ν-domain model ---
-    tau_ps: float = 0.30              # delay [ps]
-    a_R_THz_per_ps: float = 0.60      # chirp rate dν/dt for R [THz/ps]
-    a_L_THz_per_ps: float = 0.60      # chirp rate dν/dt for L [THz/ps]
+    tau_ps: float = 1            # delay [ps]
+    a_R_THz_per_ps: float = 0.3     # chirp rate dν/dt for R [THz/ps]
+    a_L_THz_per_ps: float = 0.3     # chirp rate dν/dt for L [THz/ps]
 
     residual: float = 0.0
 
@@ -303,7 +303,7 @@ class AnalysisConfig(FitParameter1):
       - residuals_threshold: max allowed residual for accepting a phase
       - avg_spectra: number of spectra to average in PhaseTracker
     """
-    wavelength_range: Range[Length] = Range(Length(796, Prefix.NANO), Length(810, Prefix.NANO))
+    wavelength_range: Range[Length] = Range(Length(780, Prefix.NANO), Length(810, Prefix.NANO))
     residuals_threshold: float = 15
     avg_spectra: int = 10
     has_acceleration: bool = True

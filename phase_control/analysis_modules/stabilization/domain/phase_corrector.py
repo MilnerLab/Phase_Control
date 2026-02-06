@@ -12,8 +12,8 @@ from base_core.math.models import Angle
 PHASE_TOLERANCE = Angle(10, AngleUnit.DEG)
 
 # Converts phase error [deg] to half-wave-plate rotation [deg]
-CONVERSION_CONST = 1 / 4       # depends on optics
-CORRECTION_SIGN = -1           # depends on QWP orientation
+CONVERSION_CONST = 1 / 8       # depends on optics
+CORRECTION_SIGN = 1           # depends on QWP orientation
 
 
 @dataclass
@@ -46,8 +46,8 @@ class PhaseCorrector:
         if phase == 0.0:
             return
         
-        phase_error = self._wrap_phase_pi(Angle(phase - self._target_phase))
-        #phase_error = Angle(phase_wrapped - self._target_phase)
+        #phase_error = self._wrap_phase_pi(Angle(phase - self._target_phase))
+        phase_error = Angle(phase - self._target_phase)
         
         '''
         if Angle(np.abs(phase_wrapped - self._target_phase)) <= Angle(np.abs(np.abs(phase_wrapped) - np.abs(self._target_phase))):
