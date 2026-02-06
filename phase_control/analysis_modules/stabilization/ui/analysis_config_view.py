@@ -58,6 +58,7 @@ class AnalysisConfigView(ViewBase[AnalysisConfigVM]):
         self._bw = QDoubleSpinBox(); self._bw.setButtonSymbols(QAbstractSpinBox.NoButtons)
         self._baseline = QDoubleSpinBox(); self._baseline.setButtonSymbols(QAbstractSpinBox.NoButtons)
         self._phase = QDoubleSpinBox(); self._phase.setButtonSymbols(QAbstractSpinBox.NoButtons)
+        self._tau = QDoubleSpinBox(); self._tau.setButtonSymbols(QAbstractSpinBox.NoButtons)
         self._ar = QDoubleSpinBox(); self._ar.setButtonSymbols(QAbstractSpinBox.NoButtons)
         self._al = QDoubleSpinBox(); self._al.setButtonSymbols(QAbstractSpinBox.NoButtons)
         self._residual = QDoubleSpinBox(); self._residual.setButtonSymbols(QAbstractSpinBox.NoButtons)
@@ -66,16 +67,18 @@ class AnalysisConfigView(ViewBase[AnalysisConfigVM]):
             sb.setDecimals(4); sb.setRange(-1e6, 1e6); sb.setSingleStep(0.01)
         self._baseline.setDecimals(6); self._baseline.setRange(-1e9, 1e9); self._baseline.setSingleStep(0.001)
         self._phase.setDecimals(6); self._phase.setRange(-1e9, 1e9); self._phase.setSingleStep(0.01)
+        self._tau.setDecimals(6); self._tau.setRange(-1e9, 1e9); self._tau.setSingleStep(0.01)
         self._ar.setDecimals(8); self._ar.setRange(-1e12, 1e12); self._ar.setSingleStep(0.001)
         self._al.setDecimals(8); self._al.setRange(-1e12, 1e12); self._al.setSingleStep(0.001)
         self._residual.setDecimals(6); self._residual.setRange(-1e12, 1e12); self._residual.setSingleStep(0.1)
 
-        f2.addRow("Carrier λ [nm]", self._carrier)
+        f2.addRow("Central λ [nm]", self._carrier)
         f2.addRow("Bandwidth [nm]", self._bw)
         f2.addRow("Baseline", self._baseline)
         f2.addRow("Phase", self._phase)
-        f2.addRow("Acceleration", self._ar)
-        f2.addRow("Acceleration", self._al)
+        f2.addRow("Tau [ps]", self._tau)
+        f2.addRow("A_r [THz/ps]", self._ar)
+        f2.addRow("A_l [THz/ps]", self._al)
         f2.addRow("Residual", self._residual)
         root.addWidget(g2)
 
@@ -120,6 +123,7 @@ class AnalysisConfigView(ViewBase[AnalysisConfigVM]):
             cfg.bandwidth = Length(self._bw.value(), Prefix.NANO)
             cfg.baseline = float(self._baseline.value())
             cfg.phase = Angle(float(self._phase.value()))
+            cfg.tau_ps = Angle(float(self._tau.value()))
             cfg.a_R_THz_per_ps = float(self._ar.value())
             cfg.a_L_THz_per_ps = float(self._al.value())
             cfg.residual = float(self._residual.value())
@@ -147,6 +151,7 @@ class AnalysisConfigView(ViewBase[AnalysisConfigVM]):
         setv(self._bw, cfg.bandwidth.value(Prefix.NANO))
         setv(self._baseline, float(cfg.baseline))
         setv(self._phase, float(getattr(cfg.phase, "value", cfg.phase)))
+        setv(self._tau, float(cfg.tau_ps))
         setv(self._ar, float(cfg.a_R_THz_per_ps))
         setv(self._al, float(cfg.a_L_THz_per_ps))
         setv(self._residual, float(cfg.residual))
@@ -154,7 +159,7 @@ class AnalysisConfigView(ViewBase[AnalysisConfigVM]):
     @Slot(bool)
     def _update_editable_state(self, running: bool) -> None:
         editable = not running
-        for sb in (self._carrier, self._bw, self._baseline, self._phase, self._ar, self._al, self._residual):
+        for sb in (self._carrier, self._bw, self._baseline, self._phase, self._tau, self._ar, self._al, self._residual):
             sb.setReadOnly(not editable)
 
     @Slot()
