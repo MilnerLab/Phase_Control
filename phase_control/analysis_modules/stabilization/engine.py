@@ -11,7 +11,7 @@ from base_core.framework.services.runnable_service_base import RunnableServiceBa
 from base_core.framework.concurrency.interfaces import ITaskRunner, StreamHandle
 from base_core.framework.events.event_bus import EventBus
 
-from base_core.math.functions import usCFG_projection
+from base_core.math.functions import usCFG_projection, cfg_projection_nu_equal_amplitudes_safe
 from base_core.math.models import Angle
 from base_core.quantities.models import Length
 from phase_control.analysis_modules.stabilization.config import AnalysisConfig
@@ -203,16 +203,16 @@ class AnalysisEngine(RunnableServiceBase):
             return None
         
         try:
-            fit_kwargs = self.config.to_fit_kwargs(usCFG_projection)
+            fit_kwargs = self.config.to_fit_kwargs(cfg_projection_nu_equal_amplitudes_safe)
             y_fit_arr = np.asarray(
-                usCFG_projection(spectrum.wavelengths_nm, **fit_kwargs),
+                cfg_projection_nu_equal_amplitudes_safe(spectrum.wavelengths_nm, **fit_kwargs),
                 dtype=float,
             )
 
             zero_kwargs = dict(fit_kwargs)
             zero_kwargs["phase"] = self.target_phase
             y_zero_arr = np.asarray(
-                usCFG_projection(spectrum.wavelengths_nm, **zero_kwargs),
+                cfg_projection_nu_equal_amplitudes_safe(spectrum.wavelengths_nm, **zero_kwargs),
                 dtype=float,
             )
         except Exception:

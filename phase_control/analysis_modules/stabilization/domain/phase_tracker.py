@@ -10,7 +10,7 @@ import lmfit
 
 from base_core.math.functions import usCFG_projection, cfg_projection_nu_equal_amplitudes_safe
 from base_core.math.models import Angle
-from phase_control.analysis_modules.stabilization.config import AnalysisConfig, FitParameter
+from phase_control.analysis_modules.stabilization.config import AnalysisConfig, FitParameter, FitParameter1
 from phase_control.core.models import Spectrum
 
 
@@ -29,7 +29,7 @@ class PhaseTracker:
 
     def __init__(self, start_config: AnalysisConfig) -> None:
         self._config: AnalysisConfig = start_config
-        self._fits: Deque[FitParameter] = deque(maxlen=self._config.avg_spectra)
+        self._fits: Deque[FitParameter1] = deque(maxlen=self._config.avg_spectra)
 
     # ------------------------------------------------------------------ #
     # Public API
@@ -47,7 +47,7 @@ class PhaseTracker:
         else:
             if self.current_phase is None:
                 # Once we have enough initial fits, consolidate them
-                self._config.copy_from(FitParameter.mean(self._fits))
+                self._config.copy_from(FitParameter1.mean(self._fits))
 
             if len(self._fits) < self._config.avg_spectra:
                 # Collect phase-only fits for averaging
@@ -55,7 +55,7 @@ class PhaseTracker:
                 self.current_phase = Angle(0)
             else:
                 # Average current batch and decide whether to accept phase
-                new_config = FitParameter.mean(self._fits)
+                new_config = FitParameter1.mean(self._fits)
                 self._fits.clear()
 
                 if new_config.residual < self._config.residuals_threshold:
@@ -68,7 +68,7 @@ class PhaseTracker:
     # Internals: fitting
     # ------------------------------------------------------------------ #
 
-    def _initialize_fit_parameters(self, spectrum: Spectrum) -> FitParameter:
+    def _initialize_fit_parameters(self, spectrum: Spectrum) -> FitParameter1:
         """
         Perform a full fit of all parameters on the given spectrum to obtain
         good starting values.
@@ -84,9 +84,9 @@ class PhaseTracker:
             **fit_kwargs,
             max_nfev=int(1_000_000),
         )
-        return FitParameter.from_fit_result(self._config, result)
+        return FitParameter1.from_fit_result(self._config, result)
 
-    def _fit_phase(self, spectrum: Spectrum) -> FitParameter:
+    def _fit_phase(self, spectrum: Spectrum) -> FitParameter1:
         """
         Fit only the phase parameter on the given spectrum.
         """
@@ -108,7 +108,7 @@ class PhaseTracker:
             **x_kwargs,
         )
 
-        return FitParameter.from_fit_result(self._config, result)
+        return FitParameter1.from_fit_result(self._config, result)
 
     @staticmethod
     def _get_first_arg_name() -> str:
