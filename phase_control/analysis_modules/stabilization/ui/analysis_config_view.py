@@ -80,8 +80,8 @@ class AnalysisConfigView(ViewBase[AnalysisConfigVM]):
         f2.addRow("Baseline", self._baseline)
         f2.addRow("Phase", self._phase)
         f2.addRow("Tau [ps]", self._tau)
-        f2.addRow("A_r [THz/ps]", self._ar)
-        f2.addRow("A_l [THz/ps]", self._al)
+        f2.addRow("Chirp_r [THz/ps]", self._ar)
+        f2.addRow("Chirp_l [THz/ps]", self._al)
         f2.addRow("Residual", self._residual)
         root.addWidget(g2)
 
