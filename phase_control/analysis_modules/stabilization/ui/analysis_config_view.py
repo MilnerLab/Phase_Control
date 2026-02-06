@@ -55,26 +55,27 @@ class AnalysisConfigView(ViewBase[AnalysisConfigVM]):
         f2 = QFormLayout(g2)
 
         self._carrier = QDoubleSpinBox(); self._carrier.setButtonSymbols(QAbstractSpinBox.NoButtons)
-        self._start = QDoubleSpinBox(); self._start.setButtonSymbols(QAbstractSpinBox.NoButtons)
         self._bw = QDoubleSpinBox(); self._bw.setButtonSymbols(QAbstractSpinBox.NoButtons)
         self._baseline = QDoubleSpinBox(); self._baseline.setButtonSymbols(QAbstractSpinBox.NoButtons)
         self._phase = QDoubleSpinBox(); self._phase.setButtonSymbols(QAbstractSpinBox.NoButtons)
-        self._acc = QDoubleSpinBox(); self._acc.setButtonSymbols(QAbstractSpinBox.NoButtons)
+        self._ar = QDoubleSpinBox(); self._ar.setButtonSymbols(QAbstractSpinBox.NoButtons)
+        self._al = QDoubleSpinBox(); self._al.setButtonSymbols(QAbstractSpinBox.NoButtons)
         self._residual = QDoubleSpinBox(); self._residual.setButtonSymbols(QAbstractSpinBox.NoButtons)
 
-        for sb in (self._carrier, self._start, self._bw):
+        for sb in (self._carrier, self._bw):
             sb.setDecimals(4); sb.setRange(-1e6, 1e6); sb.setSingleStep(0.01)
         self._baseline.setDecimals(6); self._baseline.setRange(-1e9, 1e9); self._baseline.setSingleStep(0.001)
         self._phase.setDecimals(6); self._phase.setRange(-1e9, 1e9); self._phase.setSingleStep(0.01)
-        self._acc.setDecimals(8); self._acc.setRange(-1e12, 1e12); self._acc.setSingleStep(0.001)
+        self._ar.setDecimals(8); self._ar.setRange(-1e12, 1e12); self._ar.setSingleStep(0.001)
+        self._al.setDecimals(8); self._al.setRange(-1e12, 1e12); self._al.setSingleStep(0.001)
         self._residual.setDecimals(6); self._residual.setRange(-1e12, 1e12); self._residual.setSingleStep(0.1)
 
         f2.addRow("Carrier λ [nm]", self._carrier)
-        f2.addRow("Starting λ [nm]", self._start)
         f2.addRow("Bandwidth [nm]", self._bw)
         f2.addRow("Baseline", self._baseline)
         f2.addRow("Phase", self._phase)
-        f2.addRow("Acceleration", self._acc)
+        f2.addRow("Acceleration", self._ar)
+        f2.addRow("Acceleration", self._al)
         f2.addRow("Residual", self._residual)
         root.addWidget(g2)
 
@@ -115,12 +116,12 @@ class AnalysisConfigView(ViewBase[AnalysisConfigVM]):
 
         # ---- fit params only if not running ----
         if not self.vm.is_running():
-            cfg.carrier_wavelength = Length(self._carrier.value(), Prefix.NANO)
-            cfg.starting_wavelength = Length(self._start.value(), Prefix.NANO)
+            cfg.central_wavelength = Length(self._carrier.value(), Prefix.NANO)
             cfg.bandwidth = Length(self._bw.value(), Prefix.NANO)
             cfg.baseline = float(self._baseline.value())
             cfg.phase = Angle(float(self._phase.value()))
-            cfg.acceleration = float(self._acc.value())
+            cfg.a_R_THz_per_ps = float(self._ar.value())
+            cfg.a_L_THz_per_ps = float(self._al.value())
             cfg.residual = float(self._residual.value())
 
         self.vm.notify_config_changed()
@@ -142,18 +143,18 @@ class AnalysisConfigView(ViewBase[AnalysisConfigVM]):
         setv(self._res_thresh, float(cfg.residuals_threshold))
         setv(self._avg, int(cfg.avg_spectra))
 
-        setv(self._carrier, cfg.carrier_wavelength.value(Prefix.NANO))
-        setv(self._start, cfg.starting_wavelength.value(Prefix.NANO))
+        setv(self._carrier, cfg.central_wavelength.value(Prefix.NANO))
         setv(self._bw, cfg.bandwidth.value(Prefix.NANO))
         setv(self._baseline, float(cfg.baseline))
         setv(self._phase, float(getattr(cfg.phase, "value", cfg.phase)))
-        setv(self._acc, float(cfg.acceleration))
+        setv(self._ar, float(cfg.a_R_THz_per_ps))
+        setv(self._al, float(cfg.a_L_THz_per_ps))
         setv(self._residual, float(cfg.residual))
 
     @Slot(bool)
     def _update_editable_state(self, running: bool) -> None:
         editable = not running
-        for sb in (self._carrier, self._start, self._bw, self._baseline, self._phase, self._acc, self._residual):
+        for sb in (self._carrier, self._bw, self._baseline, self._phase, self._ar, self._al, self._residual):
             sb.setReadOnly(not editable)
 
     @Slot()

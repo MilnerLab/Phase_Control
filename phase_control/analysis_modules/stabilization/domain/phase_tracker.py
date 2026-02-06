@@ -8,7 +8,7 @@ from typing import Any, Deque
 import lmfit
 
 
-from base_core.math.functions import usCFG_projection
+from base_core.math.functions import usCFG_projection, cfg_projection_nu_equal_amplitudes_safe
 from base_core.math.models import Angle
 from phase_control.analysis_modules.stabilization.config import AnalysisConfig, FitParameter
 from phase_control.core.models import Spectrum
@@ -74,9 +74,9 @@ class PhaseTracker:
         good starting values.
         """
         first_arg_name = self._get_first_arg_name()
-        model = lmfit.Model(usCFG_projection, independent_vars=[first_arg_name])
+        model = lmfit.Model(cfg_projection_nu_equal_amplitudes_safe, independent_vars=[first_arg_name])
 
-        fit_kwargs: dict[str, Any] = self._config.to_fit_kwargs(usCFG_projection)
+        fit_kwargs: dict[str, Any] = self._config.to_fit_kwargs(cfg_projection_nu_equal_amplitudes_safe)
         fit_kwargs[first_arg_name] = spectrum.wavelengths_nm
 
         result = model.fit(
@@ -91,9 +91,9 @@ class PhaseTracker:
         Fit only the phase parameter on the given spectrum.
         """
         first_arg_name = self._get_first_arg_name()
-        model = lmfit.Model(usCFG_projection, independent_vars=[first_arg_name])
+        model = lmfit.Model(cfg_projection_nu_equal_amplitudes_safe, independent_vars=[first_arg_name])
 
-        floats = self._config.to_fit_kwargs(usCFG_projection)
+        floats = self._config.to_fit_kwargs(cfg_projection_nu_equal_amplitudes_safe)
         param_kwargs: dict[str, Any] = dict(floats)
 
         params = model.make_params(**param_kwargs)
@@ -112,5 +112,5 @@ class PhaseTracker:
 
     @staticmethod
     def _get_first_arg_name() -> str:
-        sig = inspect.signature(usCFG_projection)
+        sig = inspect.signature(cfg_projection_nu_equal_amplitudes_safe)
         return next(iter(sig.parameters))
